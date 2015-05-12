@@ -1,0 +1,17 @@
+
+         CCCCCCCCCCCCCVVVVVVVV           VVVVVVVV   SSSSSSSSSSSSSSS
+      CCC::::::::::::CV::::::V           V::::::V SS:::::::::::::::S
+    CC:::::::::::::::CV::::::V           V::::::VS:::::SSSSSS::::::S
+   C:::::CCCCCCCC::::CV::::::V           V::::::VS:::::S     SSSSSSS
+  C:::::C       CCCCCC V:::::V           V:::::V S:::::S
+ C:::::C                V:::::V         V:::::V  S:::::S
+ C:::::C                 V:::::V       V:::::V    S::::SSSS
+ C:::::C                  V:::::V     V:::::V      SS::::::SSSSS
+ C:::::C                   V:::::V   V:::::V         SSS::::::::SS
+ C:::::C                    V:::::V V:::::V             SSSSSS::::S
+ C:::::C                     V:::::V:::::V                   S:::::S
+  C:::::C       CCCCCC        V:::::::::V                    S:::::S
+   C:::::CCCCCCCC::::C         V:::::::V         SSSSSSS     S:::::S
+    CC:::::::::::::::C          V:::::V          S::::::SSSSSS:::::S
+      CCC::::::::::::C           V:::V           S:::::::::::::::SS
+         CCCCCCCCCCCCC            VVV             SSSSSSSSSSSSSSS
