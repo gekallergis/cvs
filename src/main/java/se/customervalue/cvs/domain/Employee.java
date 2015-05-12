@@ -23,6 +23,9 @@ public class Employee {
 
 	private boolean isActive;
 
+	@OneToMany(mappedBy="purchasedBy")
+	private Collection<OrderHeader> orders = new ArrayList<OrderHeader>();
+
 	@ManyToOne
 	@JoinColumn(name="employer")
 	private Company employer;
@@ -30,6 +33,12 @@ public class Employee {
 	@ManyToMany
 	@JoinTable(name="EmployeeRole", joinColumns = @JoinColumn(name="employeeId"), inverseJoinColumns = @JoinColumn(name="roleId"))
 	private Collection<Role> roles = new ArrayList<Role>();
+
+	@OneToMany(mappedBy="reporter")
+	private Collection<Report> generatedReports = new ArrayList<Report>();
+
+	@OneToMany(mappedBy="uploader")
+	private Collection<SalesData> salesDataUploads = new ArrayList<SalesData>();
 
 	public Employee() {}
 
@@ -47,6 +56,30 @@ public class Employee {
 	protected void onCreate() {
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		password = encoder.encode(password);
+	}
+
+	public Collection<Report> getGeneratedReports() {
+		return generatedReports;
+	}
+
+	public void setGeneratedReports(Collection<Report> generatedReports) {
+		this.generatedReports = generatedReports;
+	}
+
+	public Collection<SalesData> getSalesDataUploads() {
+		return salesDataUploads;
+	}
+
+	public void setSalesDataUploads(Collection<SalesData> salesDataUploads) {
+		this.salesDataUploads = salesDataUploads;
+	}
+
+	public Collection<OrderHeader> getOrders() {
+		return orders;
+	}
+
+	public void setOrders(Collection<OrderHeader> orders) {
+		this.orders = orders;
 	}
 
 	public Collection<Role> getRoles() {

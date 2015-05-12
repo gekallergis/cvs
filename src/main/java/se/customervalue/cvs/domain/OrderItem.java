@@ -1,9 +1,6 @@
 package se.customervalue.cvs.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class OrderItem {
@@ -18,7 +15,19 @@ public class OrderItem {
 
 	private float unitPrice;
 
+	@ManyToOne
+	@JoinColumn(name="orderHeaderId")
+	private OrderHeader order;
+
 	public OrderItem() {}
+
+	public OrderHeader getOrder() {
+		return order;
+	}
+
+	public void setOrder(OrderHeader order) {
+		this.order = order;
+	}
 
 	public int getOrderItemId() {
 		return orderItemId;

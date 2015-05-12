@@ -25,11 +25,33 @@ public class Company {
 
 	private String postcode;
 
+	@ManyToOne
+	private Company parentCompany;
+
+	@OneToMany(mappedBy = "parentCompany")
+	private Collection<Company> subsidiaries = new ArrayList<Company>();
+
 	@OneToOne
 	private Employee managingEmployee;
 
 	@OneToMany(mappedBy="employer")
 	private Collection<Employee> employees = new ArrayList<Employee>();
+
+	@OneToMany(mappedBy="purchasedFor")
+	private Collection<OrderHeader> orders = new ArrayList<OrderHeader>();
+
+	@OneToMany(mappedBy="owner")
+	private Collection<OwnedProduct> ownedProducts = new ArrayList<OwnedProduct>();
+
+	@OneToMany(mappedBy="company")
+	private Collection<Report> reports = new ArrayList<Report>();
+
+	@ManyToOne
+	@JoinColumn(name="country")
+	private Country country;
+
+	@OneToMany(mappedBy="company")
+	private Collection<SalesData> salesData = new ArrayList<SalesData>();
 
 	public Company() {}
 
@@ -43,6 +65,62 @@ public class Company {
 		this.secondaryAddress = secondaryAddress;
 		this.postcode = postcode;
 		this.managingEmployee = managingEmployee;
+	}
+
+	public Collection<SalesData> getSalesData() {
+		return salesData;
+	}
+
+	public void setSalesData(Collection<SalesData> salesData) {
+		this.salesData = salesData;
+	}
+
+	public Country getCountry() {
+		return country;
+	}
+
+	public void setCountry(Country country) {
+		this.country = country;
+	}
+
+	public Collection<Report> getReports() {
+		return reports;
+	}
+
+	public void setReports(Collection<Report> reports) {
+		this.reports = reports;
+	}
+
+	public Collection<OwnedProduct> getOwnedProducts() {
+		return ownedProducts;
+	}
+
+	public void setOwnedProducts(Collection<OwnedProduct> ownedProducts) {
+		this.ownedProducts = ownedProducts;
+	}
+
+	public Company getParentCompany() {
+		return parentCompany;
+	}
+
+	public void setParentCompany(Company parentCompany) {
+		this.parentCompany = parentCompany;
+	}
+
+	public Collection<Company> getSubsidiaries() {
+		return subsidiaries;
+	}
+
+	public void setSubsidiaries(Collection<Company> subsidiaries) {
+		this.subsidiaries = subsidiaries;
+	}
+
+	public Collection<OrderHeader> getOrders() {
+		return orders;
+	}
+
+	public void setOrders(Collection<OrderHeader> orders) {
+		this.orders = orders;
 	}
 
 	public Collection<Employee> getEmployees() {

@@ -1,9 +1,8 @@
 package se.customervalue.cvs.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 @Entity
 public class Country {
@@ -18,7 +17,29 @@ public class Country {
 
 	private String numericCode;
 
+	@OneToMany(mappedBy="country")
+	private Collection<Company> companies = new ArrayList<Company>();
+
+	@OneToMany(mappedBy="country")
+	private Collection<Transaction> transactions = new ArrayList<Transaction>();
+
 	public Country() {}
+
+	public Collection<Transaction> getTransactions() {
+		return transactions;
+	}
+
+	public void setTransactions(Collection<Transaction> transactions) {
+		this.transactions = transactions;
+	}
+
+	public Collection<Company> getCompanies() {
+		return companies;
+	}
+
+	public void setCompanies(Collection<Company> companies) {
+		this.companies = companies;
+	}
 
 	public int getCountryId() {
 		return countryId;

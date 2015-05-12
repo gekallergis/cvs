@@ -1,9 +1,6 @@
 package se.customervalue.cvs.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -17,7 +14,43 @@ public class Transaction {
 
 	private float amount;
 
+	@ManyToOne
+	@JoinColumn(name="salesDataBatch")
+	private SalesData salesDataBatch;
+
+	@ManyToOne
+	@JoinColumn(name="country")
+	private Country country;
+
+	@ManyToOne
+	@JoinColumn(name="currency")
+	private Currency currency;
+
 	public Transaction() {}
+
+	public SalesData getSalesDataBatch() {
+		return salesDataBatch;
+	}
+
+	public void setSalesDataBatch(SalesData salesDataBatch) {
+		this.salesDataBatch = salesDataBatch;
+	}
+
+	public Country getCountry() {
+		return country;
+	}
+
+	public void setCountry(Country country) {
+		this.country = country;
+	}
+
+	public Currency getCurrency() {
+		return currency;
+	}
+
+	public void setCurrency(Currency currency) {
+		this.currency = currency;
+	}
 
 	public int getTransactionId() {
 		return transactionId;

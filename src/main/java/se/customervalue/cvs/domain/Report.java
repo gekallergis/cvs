@@ -16,11 +16,58 @@ public class Report {
 	@Enumerated(EnumType.STRING)
 	private ReportStatus status;
 
+	@ManyToOne
+	@JoinColumn(name="generatedFor")
+	private Company company;
+
+	@OneToOne
+	private Product product;
+
+	@ManyToOne
+	@JoinColumn(name="salesData")
+	private SalesData salesData;
+
+	@ManyToOne
+	@JoinColumn(name="generatedBy")
+	private Employee reporter;
+
 	public Report() {}
 
 	@PrePersist
 	protected void onCreate() {
 		generatedOn = new Date();
+	}
+
+	public Employee getReporter() {
+		return reporter;
+	}
+
+	public void setReporter(Employee reporter) {
+		this.reporter = reporter;
+	}
+
+	public SalesData getSalesData() {
+		return salesData;
+	}
+
+	public void setSalesData(SalesData salesData) {
+		this.salesData = salesData;
+	}
+
+	public Product getProduct() {
+		return product;
+	}
+
+	public void setProduct(Product product) {
+		this.product = product;
+	}
+
+	public Company getCompany() {
+		return company;
+	}
+
+	public void setCompany(Company company) {
+		this.company = company;
 	}
 
 	public int getReportId() {
