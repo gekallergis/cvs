@@ -10,11 +10,11 @@ public class OwnedProduct {
 	private int quantity;
 
 	@ManyToOne
-	@JoinColumn(name="companyId")
+	@JoinColumn(name="companyId", foreignKey = @ForeignKey(name = "FK_OwnedProductCompany"))
 	private Company owner;
 
 	@ManyToOne
-	@JoinColumn(name="productId")
+	@JoinColumn(name="productId", foreignKey = @ForeignKey(name = "FK_OwnedProductProduct"))
 	private Product product;
 
 	public OwnedProduct() {}

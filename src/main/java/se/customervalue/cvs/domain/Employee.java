@@ -27,7 +27,7 @@ public class Employee {
 	private Collection<OrderHeader> orders = new ArrayList<OrderHeader>();
 
 	@ManyToOne
-	@JoinColumn(name="employer")
+	@JoinColumn(name="employer", foreignKey = @ForeignKey(name = "FK_EmployeeEmployer"))
 	private Company employer;
 
 	@ManyToMany

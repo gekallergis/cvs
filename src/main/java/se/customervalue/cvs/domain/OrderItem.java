@@ -16,7 +16,7 @@ public class OrderItem {
 	private float unitPrice;
 
 	@ManyToOne
-	@JoinColumn(name="orderHeaderId")
+	@JoinColumn(name="orderHeaderId", foreignKey = @ForeignKey(name = "FK_OrderItemOrderHeader"))
 	private OrderHeader order;
 
 	public OrderItem() {}

@@ -21,14 +21,14 @@ public class SalesData {
 	private String filePath;
 
 	@ManyToOne
-	@JoinColumn(name="uploadedFor")
+	@JoinColumn(name="uploadedFor", foreignKey = @ForeignKey(name = "FK_SalesDataUploadedFor"))
 	private Company company;
 
 	@OneToMany(mappedBy="salesData")
 	private Collection<Report> reports = new ArrayList<Report>();
 
 	@ManyToOne
-	@JoinColumn(name="uploadedBy")
+	@JoinColumn(name="uploadedBy", foreignKey = @ForeignKey(name = "FK_SaleDataUploadedBy"))
 	private Employee uploader;
 
 	@OneToMany(mappedBy="salesDataBatch")

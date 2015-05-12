@@ -23,9 +23,9 @@ spring.datasource:
     #username: cvs
     #password: cvs
     # Test DB
-    url: jdbc:mysql://localhost:3306/testdb
-    username: testdb
-    password: testdb
+    url: jdbc:mysql://localhost:3306/cvs
+    username: cvs
+    password: cvs
     driverClassName: com.mysql.jdbc.Driver
 
 spring.jpa:

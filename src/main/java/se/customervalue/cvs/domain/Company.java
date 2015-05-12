@@ -26,12 +26,14 @@ public class Company {
 	private String postcode;
 
 	@ManyToOne
+	@JoinColumn(foreignKey = @ForeignKey(name = "FK_CompanySubsidiaries"))
 	private Company parentCompany;
 
 	@OneToMany(mappedBy = "parentCompany")
 	private Collection<Company> subsidiaries = new ArrayList<Company>();
 
 	@OneToOne
+	@JoinColumn(foreignKey = @ForeignKey(name = "FK_CompanyManagingEmployee"))
 	private Employee managingEmployee;
 
 	@OneToMany(mappedBy="employer")
@@ -47,7 +49,7 @@ public class Company {
 	private Collection<Report> reports = new ArrayList<Report>();
 
 	@ManyToOne
-	@JoinColumn(name="country")
+	@JoinColumn(name="country",  foreignKey = @ForeignKey(name = "FK_CompanyCountry"))
 	private Country country;
 
 	@OneToMany(mappedBy="company")

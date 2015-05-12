@@ -13,14 +13,15 @@ public class OrderHeader {
 	private Date purchasedOn;
 
 	@OneToOne
+	@JoinColumn(foreignKey = @ForeignKey(name = "FK_OrderHeaderInvoice"))
 	private Invoice invoice;
 
 	@ManyToOne
-	@JoinColumn(name="purchasedBy")
+	@JoinColumn(name="purchasedBy", foreignKey = @ForeignKey(name = "FK_OrderHeaderPurchasedBy"))
 	private Employee purchasedBy;
 
 	@ManyToOne
-	@JoinColumn(name="purchasedFor")
+	@JoinColumn(name="purchasedFor", foreignKey = @ForeignKey(name = "FK_OrderHeaderPurchasedFor"))
 	private Company purchasedFor;
 
 	@OneToMany(mappedBy="order")

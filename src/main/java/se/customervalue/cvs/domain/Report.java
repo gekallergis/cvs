@@ -17,18 +17,19 @@ public class Report {
 	private ReportStatus status;
 
 	@ManyToOne
-	@JoinColumn(name="generatedFor")
+	@JoinColumn(name="generatedFor", foreignKey = @ForeignKey(name = "FK_ReportGeneratedFor"))
 	private Company company;
 
 	@OneToOne
+	@JoinColumn(foreignKey = @ForeignKey(name = "FK_ReportProduct"))
 	private Product product;
 
 	@ManyToOne
-	@JoinColumn(name="salesData")
+	@JoinColumn(name="salesData", foreignKey = @ForeignKey(name = "FK_ReportSalesData"))
 	private SalesData salesData;
 
 	@ManyToOne
-	@JoinColumn(name="generatedBy")
+	@JoinColumn(name="generatedBy", foreignKey = @ForeignKey(name = "FK_ReportGeneratedBy"))
 	private Employee reporter;
 
 	public Report() {}

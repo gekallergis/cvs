@@ -15,15 +15,15 @@ public class Transaction {
 	private float amount;
 
 	@ManyToOne
-	@JoinColumn(name="salesDataBatch")
+	@JoinColumn(name="salesDataBatch", foreignKey = @ForeignKey(name = "FK_TransactionSalesDataBatch"))
 	private SalesData salesDataBatch;
 
 	@ManyToOne
-	@JoinColumn(name="country")
+	@JoinColumn(name="country", foreignKey = @ForeignKey(name = "FK_TransactionCurrency"))
 	private Country country;
 
 	@ManyToOne
-	@JoinColumn(name="currency")
+	@JoinColumn(name="currency", foreignKey = @ForeignKey(name = "FK_TransactionCountry"))
 	private Currency currency;
 
 	public Transaction() {}
