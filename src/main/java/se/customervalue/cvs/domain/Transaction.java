@@ -10,6 +10,7 @@ public class Transaction {
 
 	private String consumerId;
 
+	@Temporal(TemporalType.DATE)
 	private Date date;
 
 	private float amount;

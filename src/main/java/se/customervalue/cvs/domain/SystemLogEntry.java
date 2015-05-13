@@ -11,6 +11,7 @@ public class SystemLogEntry {
 	@Lob
 	private String text;
 
+	@Temporal(TemporalType.DATE)
 	private Date timestamp;
 
 	private String title;

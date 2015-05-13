@@ -15,6 +15,7 @@ public class SalesData {
 	@Enumerated(EnumType.STRING)
 	private SalesDataStatus status;
 
+	@Temporal(TemporalType.DATE)
 	private Date uploadedOn;
 
 	@Lob
