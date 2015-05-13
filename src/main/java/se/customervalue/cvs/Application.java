@@ -4,8 +4,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
+import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import se.customervalue.cvs.abstraction.dataaccess.*;
 import se.customervalue.cvs.domain.*;
 
@@ -14,11 +21,12 @@ import javax.transaction.Transactional;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 @SpringBootApplication
 @EnableWebSecurity // Disable Spring Security
 //@EnableRedisHttpSession
-public class Application implements CommandLineRunner {
+public class Application extends WebMvcConfigurerAdapter implements CommandLineRunner {
 	@Autowired
 	private EmployeeRepository employeeRepo;
 
@@ -62,10 +70,29 @@ public class Application implements CommandLineRunner {
 		SpringApplication.run(Application.class, args);
 	}
 
+	@Bean
+	public LocaleResolver localeResolver() {
+		SessionLocaleResolver slr = new SessionLocaleResolver();
+		slr.setDefaultLocale(Locale.US);
+		return slr;
+	}
+
+	@Bean
+	public LocaleChangeInterceptor localeChangeInterceptor() {
+		LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
+		lci.setParamName("lang");
+		return lci;
+	}
+
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(localeChangeInterceptor());
+	}
+
 	@Override
 	@Transactional
 	public void run(String... strings) throws Exception {
-		System.out.println("=======================================================");
+//		System.out.println("=======================================================");
 		Currency curr = new Currency();
 		curr.setISO4217("EUR");
 		curr.setName("Euro");
@@ -250,88 +277,88 @@ public class Application implements CommandLineRunner {
 		salesRepo.save(sd1);
 		transRepo.save(trans);
 		currencyRepo.save(curr);
-
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		List<Company> comps = companyRepo.findAll();
-		int i = 0;
-		for (Company comp : comps) {
-			if (i == 0) {
-				System.out.println(comp.getName() + "(" + comp.getEmployees().size() + ", O" + comp.getOrders().size() + ")");
-				System.out.println("\tManager: " + comp.getManagingEmployee().getFirstName() + " " + comp.getManagingEmployee().getLastName());
-				System.out.println("\tEmploy List: ");
-				Collection<Employee> emps = comp.getEmployees();
-				for (Employee employee : emps) {
-					System.out.print("\t\t" + employee.getFirstName() + " | ");
-					if(encoder.matches("123456", employee.getPassword())) {
-						System.out.print("Pass is 123456 | ");
-					} else {
-						System.out.print("Pass is NOT 123456 | ");
-					}
-					System.out.print("Roles: ");
-					Collection<Role> roles = employee.getRoles();
-					for (Role role : roles) {
-						System.out.print(role.getLabel() + ", ");
-					}
-					System.out.print(" | Orders: ");
-					Collection<OrderHeader> orders = employee.getOrders();
-					for (OrderHeader orderHeader : orders) {
-						System.out.print(orderHeader.getOrderHeaderId() + "(" + orderHeader.getOrderItems().size() + "), ");
-					}
-					System.out.println();
-				}
-				i++;
-				System.out.println("Reports: ");
-				Collection<Report> reps = comp.getReports();
-				for (Report report : reps) {
-					System.out.println(report.getProduct().getName());
-				}
-			}
-
-			System.out.println(comp.getName());
-			Collection<OwnedProduct> prods = comp.getOwnedProducts();
-			for (OwnedProduct prod : prods) {
-				System.out.println(prod.getProduct().getName() + " qty: " + prod.getQuantity());
-			}
-		}
-
-		Collection<Role> roles = roleRepo.findAll();
-		for (Role role : roles) {
-			System.out.println("Role: " + role.getLabel());
-			Collection<Employee> emps = role.getEmployees();
-			for (Employee employee : emps) {
-				System.out.println("\t" + employee.getFirstName());
-			}
-		}
-
-		Collection<OrderItem> orderItems = itemRepo.findAll();
-		for (OrderItem orderItem : orderItems) {
-			System.out.println(orderItem.getOrder().getOrderHeaderId());
-		}
-
-		Collection<Country> countries = countryRepo.findAll();
-		for (Country country : countries) {
-			System.out.println(country.getName() + " has:");
-			Collection<Company> companies = country.getCompanies();
-			for (Company company : companies) {
-				System.out.println("\t" + company.getName());
-			}
-		}
-
-		Collection<SalesData> sds = salesRepo.findAll();
-		for (SalesData sd : sds) {
-			System.out.println("Sales data for " + sd.getCompany().getName() + " regarding sales period of " + sd.getSalesPeriod() + " used with " + sd.getReports().size() + " reports so far!");
-		}
-
-		Collection<Employee> emplss = employeeRepo.findAll();
-		for (Employee empls : emplss) {
-			System.out.println(empls.getFirstName() + " has generated " + empls.getGeneratedReports().size() + " reports and has uploaded " + empls.getSalesDataUploads().size() + " sales data batches!");
-		}
-
-		Collection<Transaction> transes = transRepo.findAll();
-		for (Transaction transe : transes) {
-			System.out.println("Transaction " + transe.getTransactionId() + " fulfiled by " + transe.getConsumerId() + " on " + transe.getDate() + " at " + transe.getSalesDataBatch().getCompany().getName() +
-							   " in " + transe.getCountry().getName() + " using " + transe.getCurrency().getName());
-		}
-		System.out.println("=======================================================");
+//
+//		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+//		List<Company> comps = companyRepo.findAll();
+//		int i = 0;
+//		for (Company comp : comps) {
+//			if (i == 0) {
+//				System.out.println(comp.getName() + "(" + comp.getEmployees().size() + ", O" + comp.getOrders().size() + ")");
+//				System.out.println("\tManager: " + comp.getManagingEmployee().getFirstName() + " " + comp.getManagingEmployee().getLastName());
+//				System.out.println("\tEmploy List: ");
+//				Collection<Employee> emps = comp.getEmployees();
+//				for (Employee employee : emps) {
+//					System.out.print("\t\t" + employee.getFirstName() + " | ");
+//					if(encoder.matches("123456", employee.getPassword())) {
+//						System.out.print("Pass is 123456 | ");
+//					} else {
+//						System.out.print("Pass is NOT 123456 | ");
+//					}
+//					System.out.print("Roles: ");
+//					Collection<Role> roles = employee.getRoles();
+//					for (Role role : roles) {
+//						System.out.print(role.getLabel() + ", ");
+//					}
+//					System.out.print(" | Orders: ");
+//					Collection<OrderHeader> orders = employee.getOrders();
+//					for (OrderHeader orderHeader : orders) {
+//						System.out.print(orderHeader.getOrderHeaderId() + "(" + orderHeader.getOrderItems().size() + "), ");
+//					}
+//					System.out.println();
+//				}
+//				i++;
+//				System.out.println("Reports: ");
+//				Collection<Report> reps = comp.getReports();
+//				for (Report report : reps) {
+//					System.out.println(report.getProduct().getName());
+//				}
+//			}
+//
+//			System.out.println(comp.getName());
+//			Collection<OwnedProduct> prods = comp.getOwnedProducts();
+//			for (OwnedProduct prod : prods) {
+//				System.out.println(prod.getProduct().getName() + " qty: " + prod.getQuantity());
+//			}
+//		}
+//
+//		Collection<Role> roles = roleRepo.findAll();
+//		for (Role role : roles) {
+//			System.out.println("Role: " + role.getLabel());
+//			Collection<Employee> emps = role.getEmployees();
+//			for (Employee employee : emps) {
+//				System.out.println("\t" + employee.getFirstName());
+//			}
+//		}
+//
+//		Collection<OrderItem> orderItems = itemRepo.findAll();
+//		for (OrderItem orderItem : orderItems) {
+//			System.out.println(orderItem.getOrder().getOrderHeaderId());
+//		}
+//
+//		Collection<Country> countries = countryRepo.findAll();
+//		for (Country country : countries) {
+//			System.out.println(country.getName() + " has:");
+//			Collection<Company> companies = country.getCompanies();
+//			for (Company company : companies) {
+//				System.out.println("\t" + company.getName());
+//			}
+//		}
+//
+//		Collection<SalesData> sds = salesRepo.findAll();
+//		for (SalesData sd : sds) {
+//			System.out.println("Sales data for " + sd.getCompany().getName() + " regarding sales period of " + sd.getSalesPeriod() + " used with " + sd.getReports().size() + " reports so far!");
+//		}
+//
+//		Collection<Employee> emplss = employeeRepo.findAll();
+//		for (Employee empls : emplss) {
+//			System.out.println(empls.getFirstName() + " has generated " + empls.getGeneratedReports().size() + " reports and has uploaded " + empls.getSalesDataUploads().size() + " sales data batches!");
+//		}
+//
+//		Collection<Transaction> transes = transRepo.findAll();
+//		for (Transaction transe : transes) {
+//			System.out.println("Transaction " + transe.getTransactionId() + " fulfiled by " + transe.getConsumerId() + " on " + transe.getDate() + " at " + transe.getSalesDataBatch().getCompany().getName() +
+//							   " in " + transe.getCountry().getName() + " using " + transe.getCurrency().getName());
+//		}
+//		System.out.println("=======================================================");
 	}
 }
