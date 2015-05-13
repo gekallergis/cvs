@@ -6,4 +6,6 @@ import se.customervalue.cvs.domain.Employee;
 import javax.transaction.Transactional;
 
 @Transactional
-public interface EmployeeRepository extends JpaRepository<Employee, Long> {}
+public interface EmployeeRepository extends JpaRepository<Employee, Long> {
+	Employee findByEmail(String email);
+}

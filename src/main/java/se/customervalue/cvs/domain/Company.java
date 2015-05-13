@@ -29,7 +29,7 @@ public class Company {
 	@JoinColumn(foreignKey = @ForeignKey(name = "FK_CompanySubsidiaries"))
 	private Company parentCompany;
 
-	@OneToMany(mappedBy = "parentCompany")
+	@OneToMany(mappedBy = "parentCompany", fetch = FetchType.LAZY)
 	private Collection<Company> subsidiaries = new ArrayList<Company>();
 
 	@OneToOne
