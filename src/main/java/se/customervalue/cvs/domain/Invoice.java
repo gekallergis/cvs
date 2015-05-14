@@ -16,7 +16,7 @@ public class Invoice {
 	private float VAT;
 
 	@Enumerated(EnumType.STRING)
-	private InvoiceStatus stastus;
+	private InvoiceStatus status;
 
 	@OneToOne(mappedBy="invoice")
 	private OrderHeader order;
@@ -70,11 +70,11 @@ public class Invoice {
 		this.invoiceNumber = invoiceNumber;
 	}
 
-	public InvoiceStatus getStastus() {
-		return stastus;
+	public InvoiceStatus getStatus() {
+		return status;
 	}
 
-	public void setStastus(InvoiceStatus stastus) {
-		this.stastus = stastus;
+	public void setStatus(InvoiceStatus status) {
+		this.status = status;
 	}
 }
