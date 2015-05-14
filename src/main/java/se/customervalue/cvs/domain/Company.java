@@ -2,7 +2,7 @@ package se.customervalue.cvs.domain;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 @Entity
 public class Company {
@@ -30,30 +30,30 @@ public class Company {
 	private Company parentCompany;
 
 	@OneToMany(mappedBy = "parentCompany", fetch = FetchType.LAZY)
-	private Collection<Company> subsidiaries = new ArrayList<Company>();
+	private List<Company> subsidiaries = new ArrayList<Company>();
 
 	@OneToOne
 	@JoinColumn(foreignKey = @ForeignKey(name = "FK_CompanyManagingEmployee"))
 	private Employee managingEmployee;
 
 	@OneToMany(mappedBy="employer")
-	private Collection<Employee> employees = new ArrayList<Employee>();
+	private List<Employee> employees = new ArrayList<Employee>();
 
 	@OneToMany(mappedBy="purchasedFor")
-	private Collection<OrderHeader> orders = new ArrayList<OrderHeader>();
+	private List<OrderHeader> orders = new ArrayList<OrderHeader>();
 
 	@OneToMany(mappedBy="owner")
-	private Collection<OwnedProduct> ownedProducts = new ArrayList<OwnedProduct>();
+	private List<OwnedProduct> ownedProducts = new ArrayList<OwnedProduct>();
 
 	@OneToMany(mappedBy="company")
-	private Collection<Report> reports = new ArrayList<Report>();
+	private List<Report> reports = new ArrayList<Report>();
 
 	@ManyToOne
 	@JoinColumn(name="country",  foreignKey = @ForeignKey(name = "FK_CompanyCountry"))
 	private Country country;
 
 	@OneToMany(mappedBy="company")
-	private Collection<SalesData> salesData = new ArrayList<SalesData>();
+	private List<SalesData> salesData = new ArrayList<SalesData>();
 
 	public Company() {}
 
@@ -69,11 +69,15 @@ public class Company {
 		this.managingEmployee = managingEmployee;
 	}
 
-	public Collection<SalesData> getSalesData() {
+	public boolean hasParentCompany() {
+		return (this.parentCompany == null)?false:true;
+	}
+
+	public List<SalesData> getSalesData() {
 		return salesData;
 	}
 
-	public void setSalesData(Collection<SalesData> salesData) {
+	public void setSalesData(List<SalesData> salesData) {
 		this.salesData = salesData;
 	}
 
@@ -85,19 +89,19 @@ public class Company {
 		this.country = country;
 	}
 
-	public Collection<Report> getReports() {
+	public List<Report> getReports() {
 		return reports;
 	}
 
-	public void setReports(Collection<Report> reports) {
+	public void setReports(List<Report> reports) {
 		this.reports = reports;
 	}
 
-	public Collection<OwnedProduct> getOwnedProducts() {
+	public List<OwnedProduct> getOwnedProducts() {
 		return ownedProducts;
 	}
 
-	public void setOwnedProducts(Collection<OwnedProduct> ownedProducts) {
+	public void setOwnedProducts(List<OwnedProduct> ownedProducts) {
 		this.ownedProducts = ownedProducts;
 	}
 
@@ -109,23 +113,23 @@ public class Company {
 		this.parentCompany = parentCompany;
 	}
 
-	public Collection<Company> getSubsidiaries() {
+	public List<Company> getSubsidiaries() {
 		return subsidiaries;
 	}
 
-	public void setSubsidiaries(Collection<Company> subsidiaries) {
+	public void setSubsidiaries(List<Company> subsidiaries) {
 		this.subsidiaries = subsidiaries;
 	}
 
-	public Collection<OrderHeader> getOrders() {
+	public List<OrderHeader> getOrders() {
 		return orders;
 	}
 
-	public void setOrders(Collection<OrderHeader> orders) {
+	public void setOrders(List<OrderHeader> orders) {
 		this.orders = orders;
 	}
 
-	public Collection<Employee> getEmployees() {
+	public List<Employee> getEmployees() {
 		return employees;
 	}
 
@@ -137,7 +141,7 @@ public class Company {
 		this.managingEmployee = managingEmployee;
 	}
 
-	public void setEmployees(Collection<Employee> employee) {
+	public void setEmployees(List<Employee> employee) {
 		this.employees = employee;
 	}
 

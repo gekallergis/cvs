@@ -2,8 +2,8 @@ package se.customervalue.cvs.domain;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 public class SalesData {
@@ -26,14 +26,14 @@ public class SalesData {
 	private Company company;
 
 	@OneToMany(mappedBy="salesData")
-	private Collection<Report> reports = new ArrayList<Report>();
+	private List<Report> reports = new ArrayList<Report>();
 
 	@ManyToOne
 	@JoinColumn(name="uploadedBy", foreignKey = @ForeignKey(name = "FK_SaleDataUploadedBy"))
 	private Employee uploader;
 
 	@OneToMany(mappedBy="salesDataBatch")
-	private Collection<Transaction> transactions = new ArrayList<Transaction>();
+	private List<Transaction> transactions = new ArrayList<Transaction>();
 
 	public SalesData() {}
 
@@ -42,11 +42,11 @@ public class SalesData {
 		uploadedOn = new Date();
 	}
 
-	public Collection<Transaction> getTransactions() {
+	public List<Transaction> getTransactions() {
 		return transactions;
 	}
 
-	public void setTransactions(Collection<Transaction> transactions) {
+	public void setTransactions(List<Transaction> transactions) {
 		this.transactions = transactions;
 	}
 
@@ -62,11 +62,11 @@ public class SalesData {
 		return company;
 	}
 
-	public Collection<Report> getReports() {
+	public List<Report> getReports() {
 		return reports;
 	}
 
-	public void setReports(Collection<Report> reports) {
+	public void setReports(List<Report> reports) {
 		this.reports = reports;
 	}
 

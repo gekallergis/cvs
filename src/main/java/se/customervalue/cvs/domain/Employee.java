@@ -4,7 +4,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 @Entity
 public class Employee {
@@ -24,7 +24,7 @@ public class Employee {
 	private boolean isActive;
 
 	@OneToMany(mappedBy="purchasedBy")
-	private Collection<OrderHeader> orders = new ArrayList<OrderHeader>();
+	private List<OrderHeader> orders = new ArrayList<OrderHeader>();
 
 	@ManyToOne
 	@JoinColumn(name="employer", foreignKey = @ForeignKey(name = "FK_EmployeeEmployer"))
@@ -32,13 +32,13 @@ public class Employee {
 
 	@ManyToMany
 	@JoinTable(name="EmployeeRole", joinColumns = @JoinColumn(name="employeeId"), inverseJoinColumns = @JoinColumn(name="roleId"))
-	private Collection<Role> roles = new ArrayList<Role>();
+	private List<Role> roles = new ArrayList<Role>();
 
 	@OneToMany(mappedBy="reporter")
-	private Collection<Report> generatedReports = new ArrayList<Report>();
+	private List<Report> generatedReports = new ArrayList<Report>();
 
 	@OneToMany(mappedBy="uploader")
-	private Collection<SalesData> salesDataUploads = new ArrayList<SalesData>();
+	private List<SalesData> salesDataUploads = new ArrayList<SalesData>();
 
 	public Employee() {}
 
@@ -58,35 +58,35 @@ public class Employee {
 		password = encoder.encode(password);
 	}
 
-	public Collection<Report> getGeneratedReports() {
+	public List<Report> getGeneratedReports() {
 		return generatedReports;
 	}
 
-	public void setGeneratedReports(Collection<Report> generatedReports) {
+	public void setGeneratedReports(List<Report> generatedReports) {
 		this.generatedReports = generatedReports;
 	}
 
-	public Collection<SalesData> getSalesDataUploads() {
+	public List<SalesData> getSalesDataUploads() {
 		return salesDataUploads;
 	}
 
-	public void setSalesDataUploads(Collection<SalesData> salesDataUploads) {
+	public void setSalesDataUploads(List<SalesData> salesDataUploads) {
 		this.salesDataUploads = salesDataUploads;
 	}
 
-	public Collection<OrderHeader> getOrders() {
+	public List<OrderHeader> getOrders() {
 		return orders;
 	}
 
-	public void setOrders(Collection<OrderHeader> orders) {
+	public void setOrders(List<OrderHeader> orders) {
 		this.orders = orders;
 	}
 
-	public Collection<Role> getRoles() {
+	public List<Role> getRoles() {
 		return roles;
 	}
 
-	public void setRoles(Collection<Role> roles) {
+	public void setRoles(List<Role> roles) {
 		this.roles = roles;
 	}
 

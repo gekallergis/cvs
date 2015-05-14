@@ -2,7 +2,7 @@ package se.customervalue.cvs.domain;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 @Entity
 public class Country {
@@ -18,26 +18,26 @@ public class Country {
 	private String numericCode;
 
 	@OneToMany(mappedBy="country")
-	private Collection<Company> companies = new ArrayList<Company>();
+	private List<Company> companies = new ArrayList<Company>();
 
 	@OneToMany(mappedBy="country")
-	private Collection<Transaction> transactions = new ArrayList<Transaction>();
+	private List<Transaction> transactions = new ArrayList<Transaction>();
 
 	public Country() {}
 
-	public Collection<Transaction> getTransactions() {
+	public List<Transaction> getTransactions() {
 		return transactions;
 	}
 
-	public void setTransactions(Collection<Transaction> transactions) {
+	public void setTransactions(List<Transaction> transactions) {
 		this.transactions = transactions;
 	}
 
-	public Collection<Company> getCompanies() {
+	public List<Company> getCompanies() {
 		return companies;
 	}
 
-	public void setCompanies(Collection<Company> companies) {
+	public void setCompanies(List<Company> companies) {
 		this.companies = companies;
 	}
 

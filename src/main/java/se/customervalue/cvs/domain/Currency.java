@@ -2,7 +2,7 @@ package se.customervalue.cvs.domain;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 @Entity
 public class Currency {
@@ -16,15 +16,15 @@ public class Currency {
 	private String numericCode;
 
 	@OneToMany(mappedBy="currency")
-	private Collection<Transaction> transactions = new ArrayList<Transaction>();
+	private List<Transaction> transactions = new ArrayList<Transaction>();
 
 	public Currency() {}
 
-	public Collection<Transaction> getTransactions() {
+	public List<Transaction> getTransactions() {
 		return transactions;
 	}
 
-	public void setTransactions(Collection<Transaction> transactions) {
+	public void setTransactions(List<Transaction> transactions) {
 		this.transactions = transactions;
 	}
 

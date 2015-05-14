@@ -2,7 +2,7 @@ package se.customervalue.cvs.domain;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 @Entity
 public class Product {
@@ -19,15 +19,15 @@ public class Product {
 	private float unitPrice;
 
 	@OneToMany(mappedBy="product")
-	private Collection<OwnedProduct> purchases = new ArrayList<OwnedProduct>();
+	private List<OwnedProduct> purchases = new ArrayList<OwnedProduct>();
 
 	public Product() {}
 
-	public Collection<OwnedProduct> getPurchases() {
+	public List<OwnedProduct> getPurchases() {
 		return purchases;
 	}
 
-	public void setPurchases(Collection<OwnedProduct> purchases) {
+	public void setPurchases(List<OwnedProduct> purchases) {
 		this.purchases = purchases;
 	}
 

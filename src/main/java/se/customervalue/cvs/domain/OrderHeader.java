@@ -2,8 +2,8 @@ package se.customervalue.cvs.domain;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 public class OrderHeader {
@@ -26,7 +26,7 @@ public class OrderHeader {
 	private Company purchasedFor;
 
 	@OneToMany(mappedBy="order")
-	private Collection<OrderItem> orderItems = new ArrayList<OrderItem>();
+	private List<OrderItem> orderItems = new ArrayList<OrderItem>();
 
 	public OrderHeader() {}
 
@@ -75,11 +75,11 @@ public class OrderHeader {
 		this.purchasedFor = purchasedFor;
 	}
 
-	public Collection<OrderItem> getOrderItems() {
+	public List<OrderItem> getOrderItems() {
 		return orderItems;
 	}
 
-	public void setOrderItems(Collection<OrderItem> orderItems) {
+	public void setOrderItems(List<OrderItem> orderItems) {
 		this.orderItems = orderItems;
 	}
 }

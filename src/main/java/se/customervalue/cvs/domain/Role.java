@@ -2,7 +2,7 @@ package se.customervalue.cvs.domain;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 @Entity
 public class Role {
@@ -12,7 +12,7 @@ public class Role {
 	private String label;
 
 	@ManyToMany(mappedBy = "roles")
-	private Collection<Employee> employees = new ArrayList<Employee>();
+	private List<Employee> employees = new ArrayList<Employee>();
 
 	public Role() {}
 
@@ -20,11 +20,11 @@ public class Role {
 		this.label = label;
 	}
 
-	public Collection<Employee> getEmployees() {
+	public List<Employee> getEmployees() {
 		return employees;
 	}
 
-	public void setEmployees(Collection<Employee> employees) {
+	public void setEmployees(List<Employee> employees) {
 		this.employees = employees;
 	}
 
