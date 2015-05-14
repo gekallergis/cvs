@@ -1,5 +1,9 @@
 package se.customervalue.cvs.api.representation.domain;
 
+import se.customervalue.cvs.domain.Employee;
+import se.customervalue.cvs.domain.Role;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class EmployeeRepresentation {
@@ -20,6 +24,23 @@ public class EmployeeRepresentation {
 	private CompanyRepresentation employer;
 
 	public EmployeeRepresentation() {}
+
+	public EmployeeRepresentation(Employee employee) {
+		this.employeeId = employee.getEmployeeId();
+		this.email = employee.getEmail();
+		this.firstName = employee.getFirstName();
+		this.lastName = employee.getLastName();
+		this.photoPath = employee.getPhotoPath();
+		this.isActive = employee.isActive();
+		this.employer = new CompanyRepresentation(employee.getEmployer());
+
+		List<RoleRepresentation> roleList = new ArrayList<RoleRepresentation>();
+		for (Role role : employee.getRoles()) {
+			roleList.add(new RoleRepresentation(role));
+		}
+
+		this.roles = roleList;
+	}
 
 	public int getEmployeeId() {
 		return employeeId;

@@ -24,12 +24,7 @@ public class AccountServiceImpl implements AccountService {
 
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		if(encoder.matches(credentials.getPassword(), employee.getPassword())) {
-			EmployeeRepresentation er =  new EmployeeRepresentation();
-			er.setEmail(employee.getEmail());
-			er.setEmployeeId(employee.getEmployeeId());
-			er.setFirstName(employee.getFirstName());
-			er.setLastName(employee.getLastName());
-			return er;
+			return new EmployeeRepresentation(employee);
 		}
 
 		throw new InvalidLoginCredentialsException();

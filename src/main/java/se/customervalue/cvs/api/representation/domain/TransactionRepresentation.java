@@ -1,4 +1,3 @@
 package se.customervalue.cvs.api.representation.domain;
 
-public class TransactionRepresentation {
-}
+public class TransactionRepresentation {}
