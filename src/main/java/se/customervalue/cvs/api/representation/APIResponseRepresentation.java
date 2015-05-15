@@ -1,12 +1,12 @@
 package se.customervalue.cvs.api.representation;
 
-public class APIErrorRepresentation {
+public class APIResponseRepresentation {
 	private String code;
 	private String message;
 
-	public APIErrorRepresentation() {}
+	public APIResponseRepresentation() {}
 
-	public APIErrorRepresentation(String code, String message) {
+	public APIResponseRepresentation(String code, String message) {
 		this.code = code;
 		this.message = message;
 	}
