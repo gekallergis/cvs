@@ -9,9 +9,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import se.customervalue.cvs.api.exception.EmployeeNotFoundException;
-import se.customervalue.cvs.api.exception.InvalidLoginCredentialsException;
-import se.customervalue.cvs.api.representation.APIErrorRepresentation;
+import se.customervalue.cvs.api.exception.*;
+import se.customervalue.cvs.api.representation.APIResponseRepresentation;
 
 @ControllerAdvice
 @ResponseBody
@@ -21,13 +20,37 @@ public class APIErrorHandler {
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public APIErrorRepresentation validationErrorHandler(MethodArgumentNotValidException ex) {
-		return  new APIErrorRepresentation("101", messageSource.getMessage("validation.error", null, LocaleContextHolder.getLocale()));
+	public APIResponseRepresentation validationErrorHandler(MethodArgumentNotValidException ex) {
+		return  new APIResponseRepresentation("101", messageSource.getMessage("validation.error", null, LocaleContextHolder.getLocale()));
 	}
 
 	@ExceptionHandler({InvalidLoginCredentialsException.class, EmployeeNotFoundException.class})
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public APIErrorRepresentation invalidLoginCredentialsErrorHandler(Exception ex) {
-		return new APIErrorRepresentation("102", messageSource.getMessage("account.login.credentials.error", null, LocaleContextHolder.getLocale()));
+	public APIResponseRepresentation invalidLoginCredentialsErrorHandler(Exception ex) {
+		return new APIResponseRepresentation("102", messageSource.getMessage("account.login.credentials.invalid", null, LocaleContextHolder.getLocale()));
+	}
+
+	@ExceptionHandler(LoginTriesLimitExceededException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation loginTriesLimitExceededErrorHandler(LoginTriesLimitExceededException ex) {
+		return new APIResponseRepresentation("103", messageSource.getMessage("account.login.credentials.limit", null, LocaleContextHolder.getLocale()));
+	}
+
+	@ExceptionHandler(EmployeeAlreadyExistsException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation employeeAlreadyExistsErrorHandler(EmployeeAlreadyExistsException ex) {
+		return new APIResponseRepresentation("104", "An employee with the provided email address already exists!");
+	}
+
+	@ExceptionHandler(CompanyAlreadyExistsException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation companyAlreadyExistsErrorHandler(CompanyAlreadyExistsException ex) {
+		return new APIResponseRepresentation("105", "A company with the provided registration number already exists!");
+	}
+
+	@ExceptionHandler(ActivationKeyExpiredException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation activationExpiredErrorHandler(ActivationKeyExpiredException ex) {
+		return new APIResponseRepresentation("106", "Your activation key has expired! Please contact customer support!");
 	}
 }

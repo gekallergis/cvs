@@ -6,4 +6,6 @@ import se.customervalue.cvs.domain.Company;
 import javax.transaction.Transactional;
 
 @Transactional
-public interface CompanyRepository extends JpaRepository<Company, Long> {}
+public interface CompanyRepository extends JpaRepository<Company, Long> {
+	Company findByRegistrationNumber(String registrationNumber);
+}

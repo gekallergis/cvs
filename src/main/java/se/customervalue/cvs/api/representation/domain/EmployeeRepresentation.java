@@ -32,7 +32,12 @@ public class EmployeeRepresentation {
 		this.lastName = employee.getLastName();
 		this.photoPath = employee.getPhotoPath();
 		this.isActive = employee.isActive();
-		this.employer = new CompanyRepresentation(employee.getEmployer());
+
+		if (employee.getEmployer() != null) {
+			this.employer = new CompanyRepresentation(employee.getEmployer());
+		} else {
+			this.employer =  new CompanyRepresentation();
+		}
 
 		List<RoleRepresentation> roleList = new ArrayList<RoleRepresentation>();
 		for (Role role : employee.getRoles()) {

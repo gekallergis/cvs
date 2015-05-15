@@ -1,5 +1,9 @@
 package se.customervalue.cvs.domain;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import se.customervalue.cvs.api.representation.CompanyRegistrationInfoRepresentation;
+import se.customervalue.cvs.common.CVSConfig;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +17,7 @@ public class Company {
 
 	private String phoneNumber;
 
+	@Column(unique = true)
 	private String registrationNumber;
 
 	private float invoiceLimit;
@@ -57,6 +62,16 @@ public class Company {
 
 	public Company() {}
 
+	public Company(CompanyRegistrationInfoRepresentation companyInfo) {
+		this.registrationNumber = companyInfo.getRegistrationNumber();
+		this.name = companyInfo.getName();
+		this.primaryAddress = companyInfo.getPrimaryAddress();
+		this.secondaryAddress = companyInfo.getSecondaryAddress();
+		this.postcode = companyInfo.getPostcode();
+		this.city = companyInfo.getCity();
+		this.phoneNumber = companyInfo.getPhoneNumber();
+	}
+
 	public Company(String name, String phoneNumber, String registrationNumber, float invoiceLimit, String city, String primaryAddress, String secondaryAddress, String postcode, Employee managingEmployee) {
 		this.name = name;
 		this.phoneNumber = phoneNumber;
@@ -67,6 +82,11 @@ public class Company {
 		this.secondaryAddress = secondaryAddress;
 		this.postcode = postcode;
 		this.managingEmployee = managingEmployee;
+	}
+
+	@PrePersist
+	protected void onCreate() {
+		this.invoiceLimit = CVSConfig.DEFAULT_INVOICE_LIMIT;
 	}
 
 	public boolean hasParentCompany() {

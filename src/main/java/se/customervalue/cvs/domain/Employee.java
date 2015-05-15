@@ -1,6 +1,9 @@
 package se.customervalue.cvs.domain;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import se.customervalue.cvs.api.representation.EmployeeRegistrationInfoRepresentation;
+import se.customervalue.cvs.api.representation.domain.EmployeeRepresentation;
+import se.customervalue.cvs.common.CVSConfig;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -11,6 +14,7 @@ public class Employee {
 	@Id	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int employeeId;
 
+	@Column(unique = true)
 	private String email;
 
 	private String firstName;
@@ -22,6 +26,8 @@ public class Employee {
 	private String photoPath;
 
 	private boolean isActive;
+
+	private int loginTries;
 
 	@OneToMany(mappedBy="purchasedBy")
 	private List<OrderHeader> orders = new ArrayList<OrderHeader>();
@@ -42,6 +48,14 @@ public class Employee {
 
 	public Employee() {}
 
+	public Employee(EmployeeRegistrationInfoRepresentation employee) {
+		this.email = employee.getEmail();
+		this.firstName = employee.getFirstName();
+		this.lastName = employee.getLastName();
+		this.password = employee.getPassword();
+		this.isActive = false;
+	}
+
 	public Employee(String email, String firstName, String lastName, String password, String photoPath, boolean isActive, Company employer) {
 		this.email = email;
 		this.firstName = firstName;
@@ -55,7 +69,17 @@ public class Employee {
 	@PrePersist
 	protected void onCreate() {
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		password = encoder.encode(password);
+		this.password = encoder.encode(password);
+		this.loginTries = CVSConfig.LOGIN_MAX_TRIES;
+		this.photoPath = "assets/img/avatars/male-big.png";
+	}
+
+	public int getLoginTries() {
+		return loginTries;
+	}
+
+	public void setLoginTries(int loginTries) {
+		this.loginTries = loginTries;
 	}
 
 	public List<Report> getGeneratedReports() {

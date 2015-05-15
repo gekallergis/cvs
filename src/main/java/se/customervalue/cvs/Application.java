@@ -5,9 +5,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -16,15 +16,14 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import se.customervalue.cvs.abstraction.dataaccess.*;
 import se.customervalue.cvs.domain.*;
 
-import javax.swing.tree.TreeNode;
 import javax.transaction.Transactional;
 import java.util.Calendar;
-import java.util.Collection;
-import java.util.List;
 import java.util.Locale;
 
 @SpringBootApplication
 @EnableWebSecurity // Disable Spring Security
+@EnableScheduling
+//@EnableAsync
 //@EnableRedisHttpSession
 public class Application extends WebMvcConfigurerAdapter implements CommandLineRunner {
 	@Autowired
@@ -233,6 +232,7 @@ public class Application extends WebMvcConfigurerAdapter implements CommandLineR
 		item2.setOrder(order);
 
 		Employee emp = new Employee("kallergis.george@gmail.com", "George", "Kallergis", "123456", null, false, co);
+		emp.setIsActive(true);
 		emp.getRoles().add(role1);
 		emp.getOrders().add(order);
 		emp.getSalesDataUploads().add(sd1);
