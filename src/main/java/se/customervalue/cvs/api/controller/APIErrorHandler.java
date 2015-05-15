@@ -20,37 +20,49 @@ public class APIErrorHandler {
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public APIResponseRepresentation validationErrorHandler(MethodArgumentNotValidException ex) {
+	public APIResponseRepresentation validationExceptionHandler(MethodArgumentNotValidException ex) {
 		return  new APIResponseRepresentation("101", messageSource.getMessage("validation.error", null, LocaleContextHolder.getLocale()));
 	}
 
 	@ExceptionHandler({InvalidLoginCredentialsException.class, EmployeeNotFoundException.class})
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public APIResponseRepresentation invalidLoginCredentialsErrorHandler(Exception ex) {
+	public APIResponseRepresentation invalidLoginCredentialsExceptionHandler(Exception ex) {
 		return new APIResponseRepresentation("102", messageSource.getMessage("account.login.credentials.invalid", null, LocaleContextHolder.getLocale()));
 	}
 
 	@ExceptionHandler(LoginTriesLimitExceededException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public APIResponseRepresentation loginTriesLimitExceededErrorHandler(LoginTriesLimitExceededException ex) {
+	public APIResponseRepresentation loginTriesLimitExceededExceptionHandler(LoginTriesLimitExceededException ex) {
 		return new APIResponseRepresentation("103", messageSource.getMessage("account.login.credentials.limit", null, LocaleContextHolder.getLocale()));
 	}
 
 	@ExceptionHandler(EmployeeAlreadyExistsException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public APIResponseRepresentation employeeAlreadyExistsErrorHandler(EmployeeAlreadyExistsException ex) {
+	public APIResponseRepresentation employeeAlreadyExistsExceptionHandler(EmployeeAlreadyExistsException ex) {
 		return new APIResponseRepresentation("104", "An employee with the provided email address already exists!");
 	}
 
 	@ExceptionHandler(CompanyAlreadyExistsException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public APIResponseRepresentation companyAlreadyExistsErrorHandler(CompanyAlreadyExistsException ex) {
+	public APIResponseRepresentation companyAlreadyExistsExceptionHandler(CompanyAlreadyExistsException ex) {
 		return new APIResponseRepresentation("105", "A company with the provided registration number already exists!");
 	}
 
 	@ExceptionHandler(ActivationKeyExpiredException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public APIResponseRepresentation activationExpiredErrorHandler(ActivationKeyExpiredException ex) {
+	public APIResponseRepresentation activationExpiredExceptionHandler(ActivationKeyExpiredException ex) {
 		return new APIResponseRepresentation("106", "Your activation key has expired! Please contact customer support!");
+	}
+
+	@ExceptionHandler(UnauthorizedAccess.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation unauthorizedAccessExceptionHandler(UnauthorizedAccess ex) {
+		return new APIResponseRepresentation("107", "You have to be logged in to access this resource!");
+	}
+
+	@ExceptionHandler(UnattachedEmployeeException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation unattachedEmployeeExceptionHandler(UnattachedEmployeeException ex) {
+		return new APIResponseRepresentation("108", "Your account is not attached to a company yet! Contact customer support or your manager!");
 	}
 }

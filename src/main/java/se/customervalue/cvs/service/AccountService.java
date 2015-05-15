@@ -9,10 +9,11 @@ import se.customervalue.cvs.api.representation.domain.EmployeeRepresentation;
 import java.util.List;
 
 public interface AccountService {
-	EmployeeRepresentation login(LoginCredentialsRepresentation credentials) throws EmployeeNotFoundException, InvalidLoginCredentialsException, LoginTriesLimitExceededException;
+	EmployeeRepresentation login(LoginCredentialsRepresentation credentials) throws EmployeeNotFoundException, InvalidLoginCredentialsException, LoginTriesLimitExceededException, UnattachedEmployeeException;
 	APIResponseRepresentation resetPassword(PasswordResetCredentialsRepresentation credentials) throws EmployeeNotFoundException;
 	APIResponseRepresentation register(RegistrationInfoRepresentation registrationInfo) throws EmployeeAlreadyExistsException, CompanyAlreadyExistsException;
 	APIResponseRepresentation activate(ActivationKeyRepresentation activationKey) throws ActivationKeyExpiredException;
+	List<EmployeeRepresentation> getEmployees(EmployeeRepresentation loggedInEmployee);
 	List<CountryRepresentation> getCountries();
 
 	@Scheduled

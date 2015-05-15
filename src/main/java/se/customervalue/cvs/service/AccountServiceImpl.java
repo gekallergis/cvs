@@ -3,23 +3,18 @@ package se.customervalue.cvs.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import se.customervalue.cvs.abstraction.dataaccess.CompanyRepository;
-import se.customervalue.cvs.abstraction.dataaccess.CountryRepository;
-import se.customervalue.cvs.abstraction.dataaccess.ActivationRepository;
-import se.customervalue.cvs.abstraction.dataaccess.EmployeeRepository;
+import se.customervalue.cvs.abstraction.dataaccess.*;
 import se.customervalue.cvs.abstraction.externalservice.MailService;
 import se.customervalue.cvs.api.exception.*;
 import se.customervalue.cvs.api.representation.*;
 import se.customervalue.cvs.api.representation.domain.CountryRepresentation;
 import se.customervalue.cvs.api.representation.domain.EmployeeRepresentation;
 import se.customervalue.cvs.common.CVSConfig;
-import se.customervalue.cvs.domain.Activation;
-import se.customervalue.cvs.domain.Company;
-import se.customervalue.cvs.domain.Country;
-import se.customervalue.cvs.domain.Employee;
+import se.customervalue.cvs.domain.*;
 
 import javax.transaction.Transactional;
 import java.math.BigInteger;
@@ -47,13 +42,21 @@ public class AccountServiceImpl implements AccountService {
 	private ActivationRepository activationRepository;
 
 	@Autowired
+	private RoleRepository roleRepository;
+
+	@Autowired
 	private MailService mailService;
 
 	@Override @Transactional
-	public EmployeeRepresentation login(LoginCredentialsRepresentation credentials) throws EmployeeNotFoundException, InvalidLoginCredentialsException, LoginTriesLimitExceededException {
+	public EmployeeRepresentation login(LoginCredentialsRepresentation credentials) throws EmployeeNotFoundException, InvalidLoginCredentialsException, LoginTriesLimitExceededException, UnattachedEmployeeException {
 		Employee employee = employeeRepository.findByEmail(credentials.getEmail());
 		if(employee == null) {
 			throw new EmployeeNotFoundException();
+		}
+
+		Role adminRole = roleRepository.findByLabel("isAdmin");
+		if(employee.getEmployer() == null && !employee.getRoles().contains(adminRole)) {
+			throw new UnattachedEmployeeException();
 		}
 
 		if (employee.isActive()) {
@@ -94,13 +97,9 @@ public class AccountServiceImpl implements AccountService {
 		log.debug("[Account Service] Generated new password " + randomPassowrd + " for " + credentials.getEmail());
 
 		// Email the new password
-		boolean mailSent = mailService.send(employee.getEmail(), "CVS Password Reset", "Your new password is " + randomPassowrd);
+		mailService.send(employee.getEmail(), "CVS Password Reset", "Your new password is " + randomPassowrd);
 
-		if(mailSent) {
-			return new APIResponseRepresentation("000", "An email has been sent with your new password! It is strongly advised that you change your password imediately after logging in!");
-		} else {
-			return new APIResponseRepresentation("001", "Your password has been reset, but a mail could not be sent! Please contact customer support!");
-		}
+		return new APIResponseRepresentation("000", "An email has been sent with your new password! It is strongly advised that you change your password imediately after logging in!");
 	}
 
 	@Override @Transactional
@@ -135,14 +134,10 @@ public class AccountServiceImpl implements AccountService {
 		activationRepository.save(newEmployeeActivation);
 		employeeRepository.save(newEmployee);
 
-		boolean mailSent = mailService.send(newEmployee.getEmail(), "Welcome to CVS!", "Click <a href='" + CVSConfig.SERVICE_ENDPOINT + "activate/" + newEmployeeActivation.getActivationKey() + "'>here</a> to activate your account!");
+		mailService.send(newEmployee.getEmail(), "Welcome to CVS!", "Click <a href='" + CVSConfig.SERVICE_ENDPOINT + "activate/" + newEmployeeActivation.getActivationKey() + "'>here</a> to activate your account!");
 		log.debug("[Account Service] Got registration request for employee " + newEmployee.getFirstName() + " " + newEmployee.getLastName());
 
-		if(mailSent) {
-			return new APIResponseRepresentation("002", "Welcome! Activate your account and login!");
-		} else {
-			return new APIResponseRepresentation("003", "Your account has been created, but a mail could not be sent! Please contact customer support!");
-		}
+		return new APIResponseRepresentation("002", "Welcome! Activate your account and login!");
 	}
 
 	@Override @Transactional
@@ -159,6 +154,48 @@ public class AccountServiceImpl implements AccountService {
 			activationRepository.delete(checkActivation);
 		}
 		return new APIResponseRepresentation("004", "Your account has been activated! You can now login!");
+	}
+
+	@Override @Transactional
+	public List<EmployeeRepresentation> getEmployees(EmployeeRepresentation loggedInEmployee) {
+		Role adminRole = roleRepository.findByLabel("isAdmin");
+		Employee currentEmployee = employeeRepository.findByEmail(loggedInEmployee.getEmail());
+		List<EmployeeRepresentation> employeeList = new ArrayList<EmployeeRepresentation>();
+		if(currentEmployee.getRoles().contains(adminRole)) {
+			log.debug("[Account Service] Retrieving all employees for admin user!");
+			List<Employee> allEmployees = employeeRepository.findAll();
+			for (Employee employee : allEmployees) {
+				employeeList.add(new EmployeeRepresentation(employee));
+			}
+			return employeeList;
+		}
+
+		Company currentCompany = currentEmployee.getEmployer();
+		Employee currentCompanyManager = currentCompany.getManagingEmployee();
+		if(currentCompany.hasManagingEmployee() && currentEmployee.getEmployeeId() == currentCompanyManager.getEmployeeId()) {
+			List<Company> subsidiaries = companyRepository.findByParentCompany(currentCompany);
+			if(subsidiaries.size() > 0) {
+				log.debug("[Account Service] Retrieving all group employees for group manager!");
+				for (Company subsidiary : subsidiaries) {
+					List<Employee> allSubsidiaryEmployees = employeeRepository.findByEmployer(subsidiary);
+					for (Employee employee : allSubsidiaryEmployees) {
+						employeeList.add(new EmployeeRepresentation(employee));
+					}
+				}
+				employeeList.add(new EmployeeRepresentation(currentEmployee));
+			} else {
+				log.debug("[Account Service] Retrieving all company employees for company manager!");
+				List<Employee> allCopmanyEmployees = employeeRepository.findByEmployer(currentCompany);
+				for (Employee employee : allCopmanyEmployees) {
+					employeeList.add(new EmployeeRepresentation(employee));
+				}
+			}
+		} else {
+			log.debug("[Account Service] Retrieving single employee for a company employee!");
+			employeeList.add(new EmployeeRepresentation(currentEmployee));
+		}
+
+		return employeeList;
 	}
 
 	@Override @Transactional
