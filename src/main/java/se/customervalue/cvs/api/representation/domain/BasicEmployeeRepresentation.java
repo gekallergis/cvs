@@ -15,12 +15,12 @@ public class BasicEmployeeRepresentation {
 
 	public BasicEmployeeRepresentation() {}
 
-	public BasicEmployeeRepresentation(Employee managingEmployee) {
-		this.employeeId = managingEmployee.getEmployeeId();
-		this.email = managingEmployee.getEmail();
-		this.firstName = managingEmployee.getFirstName();
-		this.lastName = managingEmployee.getLastName();
-		this.photoPath = managingEmployee.getPhotoPath();
+	public BasicEmployeeRepresentation(Employee employee) {
+		this.employeeId = employee.getEmployeeId();
+		this.email = employee.getEmail();
+		this.firstName = employee.getFirstName();
+		this.lastName = employee.getLastName();
+		this.photoPath = employee.getPhotoPath();
 	}
 
 	public BasicEmployeeRepresentation(int employeeId, String email, String firstName, String lastName, String photoPath) {

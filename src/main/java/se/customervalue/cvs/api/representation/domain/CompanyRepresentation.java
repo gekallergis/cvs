@@ -43,7 +43,9 @@ public class CompanyRepresentation {
 		if (company.hasParentCompany()) {
 			this.parentCompany = new CompanyRepresentation(company.getParentCompany());
 		}
-		this.managingEmployee = new BasicEmployeeRepresentation(company.getManagingEmployee());
+		if (company.hasManagingEmployee()) {
+			this.managingEmployee = new BasicEmployeeRepresentation(company.getManagingEmployee());
+		}
 	}
 
 	public CompanyRepresentation(int companyId, String registrationNumber, String name, String phoneNumber, float invoiceLimit, String primaryAddress, String secondaryAddress, String postcode, String city) {
