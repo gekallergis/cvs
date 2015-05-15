@@ -20,6 +20,12 @@ public class Currency {
 
 	public Currency() {}
 
+	public Currency(String name, String ISO4217, String numericCode) {
+		this.name = name;
+		this.ISO4217 = ISO4217;
+		this.numericCode = numericCode;
+	}
+
 	public List<Transaction> getTransactions() {
 		return transactions;
 	}

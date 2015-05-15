@@ -23,6 +23,13 @@ public class Product {
 
 	public Product() {}
 
+	public Product(String name, String info, boolean isPopular, float unitPrice) {
+		this.name = name;
+		this.info = info;
+		this.isPopular = isPopular;
+		this.unitPrice = unitPrice;
+	}
+
 	public List<OwnedProduct> getPurchases() {
 		return purchases;
 	}

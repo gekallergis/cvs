@@ -30,6 +30,10 @@ public class OrderHeader {
 
 	public OrderHeader() {}
 
+	public OrderHeader(Date purchasedOn) {
+		this.purchasedOn = purchasedOn;
+	}
+
 	@PrePersist
 	protected void onCreate() {
 		purchasedOn = new Date();

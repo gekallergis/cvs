@@ -56,14 +56,13 @@ public class Employee {
 		this.isActive = false;
 	}
 
-	public Employee(String email, String firstName, String lastName, String password, String photoPath, boolean isActive, Company employer) {
+	public Employee(String email, String firstName, String lastName, String password, String photoPath, boolean isActive) {
 		this.email = email;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.password = password;
 		this.photoPath = photoPath;
 		this.isActive = isActive;
-		this.employer = employer;
 	}
 
 	@PrePersist

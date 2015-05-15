@@ -72,16 +72,14 @@ public class Company {
 		this.phoneNumber = companyInfo.getPhoneNumber();
 	}
 
-	public Company(String name, String phoneNumber, String registrationNumber, float invoiceLimit, String city, String primaryAddress, String secondaryAddress, String postcode, Employee managingEmployee) {
+	public Company(String name, String phoneNumber, String registrationNumber, String city, String primaryAddress, String secondaryAddress, String postcode) {
 		this.name = name;
 		this.phoneNumber = phoneNumber;
 		this.registrationNumber = registrationNumber;
-		this.invoiceLimit = invoiceLimit;
 		this.city = city;
 		this.primaryAddress = primaryAddress;
 		this.secondaryAddress = secondaryAddress;
 		this.postcode = postcode;
-		this.managingEmployee = managingEmployee;
 	}
 
 	@PrePersist
@@ -90,7 +88,11 @@ public class Company {
 	}
 
 	public boolean hasParentCompany() {
-		return (this.parentCompany == null)?false:true;
+		return (this.parentCompany != null);
+	}
+
+	public boolean hasManagingEmployee() {
+		return (this.managingEmployee != null);
 	}
 
 	public List<SalesData> getSalesData() {

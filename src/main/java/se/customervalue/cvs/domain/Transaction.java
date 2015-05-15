@@ -29,6 +29,12 @@ public class Transaction {
 
 	public Transaction() {}
 
+	public Transaction(String consumerId, Date date, float amount) {
+		this.consumerId = consumerId;
+		this.date = date;
+		this.amount = amount;
+	}
+
 	public SalesData getSalesDataBatch() {
 		return salesDataBatch;
 	}

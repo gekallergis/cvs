@@ -21,6 +21,13 @@ public class OrderItem {
 
 	public OrderItem() {}
 
+	public OrderItem(String name, String description, int quantity, float unitPrice) {
+		this.name = name;
+		this.description = description;
+		this.quantity = quantity;
+		this.unitPrice = unitPrice;
+	}
+
 	public OrderHeader getOrder() {
 		return order;
 	}

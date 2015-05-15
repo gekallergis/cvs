@@ -37,6 +37,13 @@ public class SalesData {
 
 	public SalesData() {}
 
+	public SalesData(String salesPeriod, SalesDataStatus status, Date uploadedOn, String filePath) {
+		this.salesPeriod = salesPeriod;
+		this.status = status;
+		this.uploadedOn = uploadedOn;
+		this.filePath = filePath;
+	}
+
 	@PrePersist
 	protected void onCreate() {
 		uploadedOn = new Date();

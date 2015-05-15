@@ -35,6 +35,12 @@ public class Report {
 
 	public Report() {}
 
+	public Report(Date generatedOn, String filePath, ReportStatus status) {
+		this.generatedOn = generatedOn;
+		this.filePath = filePath;
+		this.status = status;
+	}
+
 	@PrePersist
 	protected void onCreate() {
 		generatedOn = new Date();

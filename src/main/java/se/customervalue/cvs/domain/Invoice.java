@@ -23,10 +23,11 @@ public class Invoice {
 
 	public Invoice() {}
 
-	public Invoice(String invoiceNumber, Date dueDate, float VAT) {
+	public Invoice(String invoiceNumber, Date dueDate, float VAT, InvoiceStatus status) {
 		this.invoiceNumber = invoiceNumber;
 		this.dueDate = dueDate;
 		this.VAT = VAT;
+		this.status = status;
 	}
 
 	public OrderHeader getOrder() {

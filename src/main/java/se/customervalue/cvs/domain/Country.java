@@ -25,6 +25,13 @@ public class Country {
 
 	public Country() {}
 
+	public Country(String name, String ISO31661a2, String ISO31661a3, String numericCode) {
+		this.name = name;
+		this.ISO31661a2 = ISO31661a2;
+		this.ISO31661a3 = ISO31661a3;
+		this.numericCode = numericCode;
+	}
+
 	public List<Transaction> getTransactions() {
 		return transactions;
 	}
