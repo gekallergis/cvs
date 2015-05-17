@@ -24,7 +24,7 @@ public class APIErrorHandler {
 		return  new APIResponseRepresentation("101", messageSource.getMessage("validation.error", null, LocaleContextHolder.getLocale()));
 	}
 
-	@ExceptionHandler({InvalidLoginCredentialsException.class, EmployeeNotFoundException.class})
+	@ExceptionHandler(InvalidLoginCredentialsException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public APIResponseRepresentation invalidLoginCredentialsExceptionHandler(Exception ex) {
 		return new APIResponseRepresentation("102", messageSource.getMessage("account.login.credentials.invalid", null, LocaleContextHolder.getLocale()));
@@ -54,9 +54,9 @@ public class APIErrorHandler {
 		return new APIResponseRepresentation("106", "Your activation key has expired! Please contact customer support!");
 	}
 
-	@ExceptionHandler(UnauthorizedAccess.class)
+	@ExceptionHandler(UnauthenticatedAccess.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public APIResponseRepresentation unauthorizedAccessExceptionHandler(UnauthorizedAccess ex) {
+	public APIResponseRepresentation unauthorizedAccessExceptionHandler(UnauthenticatedAccess ex) {
 		return new APIResponseRepresentation("107", "You have to be logged in to access this resource!");
 	}
 
@@ -64,5 +64,23 @@ public class APIErrorHandler {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public APIResponseRepresentation unattachedEmployeeExceptionHandler(UnattachedEmployeeException ex) {
 		return new APIResponseRepresentation("108", "Your account is not attached to a company yet! Contact customer support or your manager!");
+	}
+
+	@ExceptionHandler(UnauthorizedResourceAccess.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation unauthorizedResourceAccessExceptionHandler(UnauthorizedResourceAccess ex) {
+		return new APIResponseRepresentation("109", "Ops! You are not allowed to access the resources requested!");
+	}
+
+	@ExceptionHandler(EmployeeEmailAlreadyInUseException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation unauthorizedResourceAccessExceptionHandler(EmployeeEmailAlreadyInUseException ex) {
+		return new APIResponseRepresentation("110", "The specified email address is already in use by another employee, please choose a different one!");
+	}
+
+	@ExceptionHandler(EmployeeNotFoundException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation employeeNotFoundExceptionHandler(Exception ex) {
+		return new APIResponseRepresentation("111", "The requested employee was not found!");
 	}
 }

@@ -34,4 +34,20 @@ public class RoleRepresentation {
 	public void setLabel(String label) {
 		this.label = label;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(this == obj) {
+			return true;
+		}
+
+		if(obj instanceof RoleRepresentation) {
+			RoleRepresentation anotherRole = (RoleRepresentation)obj;
+			if(this.roleId == anotherRole.roleId) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

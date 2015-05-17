@@ -2,7 +2,6 @@ package se.customervalue.cvs.domain;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import se.customervalue.cvs.api.representation.EmployeeRegistrationInfoRepresentation;
-import se.customervalue.cvs.api.representation.domain.EmployeeRepresentation;
 import se.customervalue.cvs.common.CVSConfig;
 
 import javax.persistence.*;
@@ -49,26 +48,26 @@ public class Employee {
 	public Employee() {}
 
 	public Employee(EmployeeRegistrationInfoRepresentation employee) {
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		this.email = employee.getEmail();
 		this.firstName = employee.getFirstName();
 		this.lastName = employee.getLastName();
-		this.password = employee.getPassword();
+		this.password = encoder.encode(employee.getPassword());
 		this.isActive = false;
 	}
 
 	public Employee(String email, String firstName, String lastName, String password, String photoPath, boolean isActive) {
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		this.email = email;
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.password = password;
+		this.password = encoder.encode(password);
 		this.photoPath = photoPath;
 		this.isActive = isActive;
 	}
 
 	@PrePersist
 	protected void onCreate() {
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		this.password = encoder.encode(password);
 		this.loginTries = CVSConfig.LOGIN_MAX_TRIES;
 		this.photoPath = "assets/img/avatars/male-big.png";
 	}
@@ -175,5 +174,21 @@ public class Employee {
 
 	public void setEmployer(Company employer) {
 		this.employer = employer;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(this == obj) {
+			return true;
+		}
+
+		if(obj instanceof Employee) {
+			Employee anotherEmployee = (Employee)obj;
+			if(this.employeeId == anotherEmployee.employeeId) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

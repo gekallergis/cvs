@@ -2,6 +2,8 @@ package se.customervalue.cvs.api.representation.domain;
 
 import se.customervalue.cvs.domain.Employee;
 
+import java.util.List;
+
 public class BasicEmployeeRepresentation {
 	private int employeeId;
 
@@ -12,6 +14,10 @@ public class BasicEmployeeRepresentation {
 	private String lastName;
 
 	private String photoPath;
+
+	private String password;
+
+	private List<RoleRepresentation> roles;
 
 	public BasicEmployeeRepresentation() {}
 
@@ -29,6 +35,22 @@ public class BasicEmployeeRepresentation {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.photoPath = photoPath;
+	}
+
+	public List<RoleRepresentation> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(List<RoleRepresentation> roles) {
+		this.roles = roles;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	public int getEmployeeId() {

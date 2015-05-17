@@ -3,7 +3,8 @@ package se.customervalue.cvs.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -11,8 +12,7 @@ import se.customervalue.cvs.abstraction.dataaccess.*;
 import se.customervalue.cvs.abstraction.externalservice.MailService;
 import se.customervalue.cvs.api.exception.*;
 import se.customervalue.cvs.api.representation.*;
-import se.customervalue.cvs.api.representation.domain.CountryRepresentation;
-import se.customervalue.cvs.api.representation.domain.EmployeeRepresentation;
+import se.customervalue.cvs.api.representation.domain.*;
 import se.customervalue.cvs.common.CVSConfig;
 import se.customervalue.cvs.domain.*;
 
@@ -28,6 +28,9 @@ import java.util.List;
 @Service
 public class AccountServiceImpl implements AccountService {
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
+
+	@Autowired
+	private MessageSource messageSource;
 
 	@Autowired
 	private EmployeeRepository employeeRepository;
@@ -196,6 +199,208 @@ public class AccountServiceImpl implements AccountService {
 		}
 
 		return employeeList;
+	}
+
+	@Override @Transactional
+	public EmployeeRepresentation getEmployee(int employeeId, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, EmployeeNotFoundException {
+		if(loggedInEmployee.getEmployeeId() == employeeId) {
+			log.debug("[Account Service] Retrieved employee info for same employee!");
+			return loggedInEmployee;
+		}
+
+		Employee employee = employeeRepository.findByEmployeeId(employeeId);
+		if(employee == null) {
+			throw new EmployeeNotFoundException();
+		}
+
+		Role adminRole = roleRepository.findByLabel("isAdmin");
+		Employee currentEmployee = employeeRepository.findByEmail(loggedInEmployee.getEmail());
+		if(currentEmployee.getRoles().contains(adminRole)) {
+			log.debug("[Account Service] Retrieved employee info for admin user!");
+			return new EmployeeRepresentation(employee);
+		}
+
+		Company managedCompany = companyRepository.findByManagingEmployee(currentEmployee);
+		Company employeeCompany = employee.getEmployer();
+		if(managedCompany != null && employeeCompany != null) {
+			if(managedCompany.getCompanyId() == employeeCompany.getCompanyId()) {
+				log.debug("[Account Service] Employee works for managed company!");
+				return new EmployeeRepresentation(employee);
+			} else {
+				log.debug("[Account Service] Requesting employee is managing " + managedCompany + "! Requested employee works for " + employeeCompany + "!");
+				List<Company> subsidiaries = companyRepository.findByParentCompany(managedCompany);
+				log.debug("[Account Service] Managed company has " + subsidiaries.size() + " subsidiaries!");
+				if(subsidiaries.size() > 0) {
+					log.debug("[Account Service] Checking all subsidiaries!");
+					for (Company subsidiary : subsidiaries) {
+						log.debug("[Account Service] \tChecking subsidiary ID " + subsidiary.getCompanyId() + " against company ID " + employeeCompany.getCompanyId());
+						if(subsidiary.getCompanyId() == employeeCompany.getCompanyId()) {
+							log.debug("[Account Service] Found match! :D");
+							return new EmployeeRepresentation(employee);
+						}
+					}
+				} else {
+					if(!(managedCompany.getCompanyId() == employeeCompany.getCompanyId())) {
+						throw new UnauthorizedResourceAccess();
+					}
+					log.debug("[Account Service] Retrieved employee for company managed by requesting employee!");
+				}
+			}
+		} else {
+			throw new UnauthorizedResourceAccess();
+		}
+
+		throw new UnauthorizedResourceAccess();
+	}
+
+	@Override @Transactional
+	public APIResponseRepresentation editEmployee(BasicEmployeeRepresentation editInfo, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, EmployeeEmailAlreadyInUseException {
+		Employee possibleDuplicate = employeeRepository.findByEmail(editInfo.getEmail());
+		Employee editEmployee = employeeRepository.findByEmployeeId(editInfo.getEmployeeId());
+		if(possibleDuplicate != null && !possibleDuplicate.equals(editEmployee)) {
+			throw new EmployeeEmailAlreadyInUseException();
+		}
+
+		Employee currentEmployee = employeeRepository.findByEmail(loggedInEmployee.getEmail());
+		log.debug("[Account Service] Editing employee info for employeeId = " + editInfo.getEmployeeId() + " while logged in as employeeId = " + currentEmployee.getEmployeeId() + "!");
+		if(currentEmployee.getEmployeeId() == editInfo.getEmployeeId()) {
+			updateEmployee(editInfo, currentEmployee);
+			employeeRepository.save(currentEmployee);
+			return new APIResponseRepresentation("005", messageSource.getMessage("account.edit.success", null, LocaleContextHolder.getLocale()));
+		}
+
+		Role adminRole = roleRepository.findByLabel("isAdmin");
+		if(currentEmployee.getRoles().contains(adminRole)) {
+			log.debug("[Account Service] Editing employee info for admin user!");
+			updateEmployee(editInfo, editEmployee);
+			employeeRepository.save(editEmployee);
+			return new APIResponseRepresentation("005", messageSource.getMessage("account.edit.success", null, LocaleContextHolder.getLocale()));
+		}
+
+		Company managedCompany = companyRepository.findByManagingEmployee(currentEmployee);
+		Company employeeCompany = editEmployee.getEmployer();
+		if(managedCompany != null && employeeCompany != null) {
+			if(managedCompany.getCompanyId() == employeeCompany.getCompanyId()) {
+				updateEmployee(editInfo, editEmployee);
+				employeeRepository.save(editEmployee);
+				return new APIResponseRepresentation("005", messageSource.getMessage("account.edit.success", null, LocaleContextHolder.getLocale()));
+			} else {
+				List<Company> subsidiaries = companyRepository.findByParentCompany(managedCompany);
+				if (subsidiaries.size() > 0) {
+					for (Company subsidiary : subsidiaries) {
+						if (subsidiary.getCompanyId() == employeeCompany.getCompanyId()) {
+							updateEmployee(editInfo, editEmployee);
+							employeeRepository.save(editEmployee);
+							return new APIResponseRepresentation("005", messageSource.getMessage("account.edit.success", null, LocaleContextHolder.getLocale()));
+						}
+					}
+				} else {
+					if (!(managedCompany.getCompanyId() == employeeCompany.getCompanyId())) {
+						log.debug("[Account Service] Attempt to edit employee working for another company than the one managend by requesting employee!");
+						throw new UnauthorizedResourceAccess();
+					}
+					log.debug("[Account Service] Editing employee working for company managed by requesting employee!");
+				}
+			}
+		} else {
+			log.debug("[Account Service] Editing of other employees not allowed for non managers!");
+			throw new UnauthorizedResourceAccess();
+		}
+
+		throw new UnauthorizedResourceAccess();
+	}
+
+	private Employee updateEmployee(BasicEmployeeRepresentation editInfo, Employee employee) {
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		log.debug("[Account Service] UPDATE EMPLOYEE");
+		log.debug("[Account Service] ===============");
+		log.debug("[Account Service] Changing first name from " + employee.getFirstName() + " to " + editInfo.getFirstName());
+		employee.setFirstName(editInfo.getFirstName());
+		log.debug("[Account Service] Changing last name from " + employee.getLastName() + " to " + editInfo.getLastName());
+		employee.setLastName(editInfo.getLastName());
+		log.debug("[Account Service] Changing email from " + employee.getEmail() + " to " + editInfo.getEmail());
+		employee.setEmail(editInfo.getEmail());
+
+		if (editInfo.getPassword() != null) {
+			log.debug("[Account Service] Changing password to " + editInfo.getPassword());
+			employee.setPassword(encoder.encode(editInfo.getPassword()));
+		}
+
+		log.debug("[Account Service] Removing employee from roles!");
+		for (Role role : employee.getRoles()) {
+			log.debug("[Account Service] Removing from role " + role.getLabel());
+			role.getEmployees().remove(employee);
+			roleRepository.save(role);
+		}
+
+		log.debug("[Account Service] Removing all roles from employee!");
+		employee.getRoles().clear();
+
+		log.debug("[Account Service] Adding new roles to employee!");
+		List<RoleRepresentation> newRoles = editInfo.getRoles();
+		for (RoleRepresentation role : newRoles) {
+			log.debug("[Account Service] \tAdding role " + role.getRoleId() + "!");
+			Role aRole = roleRepository.findByRoleId(role.getRoleId());
+			log.debug("[Account Service] \t\tFound role entity for " + aRole.getLabel() + "!");
+			aRole.getEmployees().add(employee);
+			log.debug("[Account Service] \t\tFound " + aRole.getEmployees().size() + " employees that have that role!");
+			employee.getRoles().add(aRole);
+			log.debug("[Account Service] \t\tAdded role " + aRole.getLabel() + " to employee " + employee.getEmail() + "!");
+			roleRepository.save(aRole);
+		}
+
+		return employee;
+	}
+
+	@Override @Transactional
+	public List<CompanyRepresentation> getCompanies(EmployeeRepresentation loggedInEmployee) {
+		Role adminRole = roleRepository.findByLabel("isAdmin");
+		Employee currentEmployee = employeeRepository.findByEmail(loggedInEmployee.getEmail());
+		List<CompanyRepresentation> companyList = new ArrayList<CompanyRepresentation>();
+		if(currentEmployee.getRoles().contains(adminRole)) {
+			log.debug("[Account Service] Retrieving all companies for admin user!");
+			List<Company> allCompanies = companyRepository.findAll();
+			for (Company company : allCompanies) {
+				companyList.add(new CompanyRepresentation(company));
+			}
+			return companyList;
+		}
+
+		Company managedCompany = companyRepository.findByManagingEmployee(currentEmployee);
+		if(managedCompany != null) {
+			List<Company> subsidiaries = companyRepository.findByParentCompany(managedCompany);
+			if(subsidiaries.size() > 0) {
+				log.debug("[Account Service] Retrieving all subsidiaries for group manager!");
+				for (Company subsidiary : subsidiaries) {
+					companyList.add(new CompanyRepresentation(subsidiary));
+				}
+				companyList.add(new CompanyRepresentation(managedCompany));
+			} else {
+				log.debug("[Account Service] Retrieving company for company manager!");
+				companyList.add(new CompanyRepresentation(managedCompany));
+			}
+		}
+
+		return companyList;
+	}
+
+	@Override @Transactional
+	public List<RoleRepresentation> getRoles(EmployeeRepresentation loggedInEmployee) {
+		Role adminRole = roleRepository.findByLabel("isAdmin");
+		Employee currentEmployee = employeeRepository.findByEmail(loggedInEmployee.getEmail());
+		List<RoleRepresentation> roleList = new ArrayList<RoleRepresentation>();
+		List<Role> allRoles = roleRepository.findAll();
+		for (Role role : allRoles) {
+			roleList.add(new RoleRepresentation(role));
+		}
+		log.debug("[Account Service] Retrieved all system roles (" + roleList.size() + ")!");
+
+		if(!currentEmployee.getRoles().contains(adminRole)) {
+			log.debug("[Account Service] Removing admin role for non admin employee!");
+			roleList.remove(new RoleRepresentation(adminRole));
+		}
+
+		return roleList;
 	}
 
 	@Override @Transactional

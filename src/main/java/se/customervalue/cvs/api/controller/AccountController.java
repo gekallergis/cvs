@@ -4,8 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import se.customervalue.cvs.api.exception.*;
 import se.customervalue.cvs.api.representation.*;
-import se.customervalue.cvs.api.representation.domain.CountryRepresentation;
-import se.customervalue.cvs.api.representation.domain.EmployeeRepresentation;
+import se.customervalue.cvs.api.representation.domain.*;
 import se.customervalue.cvs.service.AccountService;
 
 import javax.servlet.http.HttpSession;
@@ -43,18 +42,58 @@ public class AccountController {
 	}
 
 	@RequestMapping(value = "/activate", method = RequestMethod.POST)
-	public APIResponseRepresentation activateEndpoint(@RequestBody ActivationKeyRepresentation key) throws ActivationKeyExpiredException {
+	public APIResponseRepresentation activateEndpoint(@RequestBody @Valid ActivationKeyRepresentation key) throws ActivationKeyExpiredException {
 		return accountService.activate(key);
 	}
 
 	@RequestMapping(value = "/employee", method = RequestMethod.GET)
-	public List<EmployeeRepresentation> employeeEndpoint() throws UnauthorizedAccess {
+	public List<EmployeeRepresentation> employeeEndpoint() throws UnauthenticatedAccess {
 		EmployeeRepresentation currentlyLoggedInEmployee = (EmployeeRepresentation)session.getAttribute("LOGGED_IN_EMPLOYEE");
 		if(currentlyLoggedInEmployee == null) {
-			throw new UnauthorizedAccess();
+			throw new UnauthenticatedAccess();
 		}
 
 		return accountService.getEmployees(currentlyLoggedInEmployee);
+	}
+
+	@RequestMapping(value = "/employee", method = RequestMethod.POST)
+	public APIResponseRepresentation employeeEditEndpoint(@RequestBody @Valid BasicEmployeeRepresentation editInfo) throws UnauthenticatedAccess, UnauthorizedResourceAccess, EmployeeEmailAlreadyInUseException {
+		EmployeeRepresentation currentlyLoggedInEmployee = (EmployeeRepresentation)session.getAttribute("LOGGED_IN_EMPLOYEE");
+		if(currentlyLoggedInEmployee == null) {
+			throw new UnauthenticatedAccess();
+		}
+
+		return accountService.editEmployee(editInfo, currentlyLoggedInEmployee);
+	}
+
+	@RequestMapping(value = "/employee/{id}", method = RequestMethod.GET)
+	public EmployeeRepresentation employeeEndpoint(@PathVariable("id") int employeeId) throws UnauthenticatedAccess, UnauthorizedResourceAccess, EmployeeNotFoundException {
+		EmployeeRepresentation currentlyLoggedInEmployee = (EmployeeRepresentation)session.getAttribute("LOGGED_IN_EMPLOYEE");
+		if(currentlyLoggedInEmployee == null) {
+			throw new UnauthenticatedAccess();
+		}
+
+		return accountService.getEmployee(employeeId, currentlyLoggedInEmployee);
+	}
+
+	@RequestMapping(value = "/company", method = RequestMethod.GET)
+	public List<CompanyRepresentation> companyEndpoint() throws UnauthenticatedAccess {
+		EmployeeRepresentation currentlyLoggedInEmployee = (EmployeeRepresentation)session.getAttribute("LOGGED_IN_EMPLOYEE");
+		if(currentlyLoggedInEmployee == null) {
+			throw new UnauthenticatedAccess();
+		}
+
+		return accountService.getCompanies(currentlyLoggedInEmployee);
+	}
+
+	@RequestMapping(value = "/role", method = RequestMethod.GET)
+	public List<RoleRepresentation> roleEndpoint() throws UnauthenticatedAccess {
+		EmployeeRepresentation currentlyLoggedInEmployee = (EmployeeRepresentation)session.getAttribute("LOGGED_IN_EMPLOYEE");
+		if(currentlyLoggedInEmployee == null) {
+			throw new UnauthenticatedAccess();
+		}
+
+		return accountService.getRoles(currentlyLoggedInEmployee);
 	}
 
 	@RequestMapping(value = "/country", method = RequestMethod.GET)
