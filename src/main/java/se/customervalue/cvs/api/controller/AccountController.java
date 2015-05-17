@@ -31,6 +31,12 @@ public class AccountController {
 		return currentlyLoggedInEmployee;
 	}
 
+	@RequestMapping(value = "/logout", method = RequestMethod.GET)
+	public APIResponseRepresentation logoutEndpoint() {
+		session.invalidate();
+		return new APIResponseRepresentation("006" , "You have been logged out successfully!");
+	}
+
 	@RequestMapping(value = "/reset", method = RequestMethod.POST)
 	public APIResponseRepresentation passwordResetEndpoint(@RequestBody @Valid PasswordResetCredentialsRepresentation credentials) throws EmployeeNotFoundException {
 		return accountService.resetPassword(credentials);
