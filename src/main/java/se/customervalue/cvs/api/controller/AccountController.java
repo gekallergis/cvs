@@ -82,6 +82,16 @@ public class AccountController {
 		return accountService.getEmployee(employeeId, currentlyLoggedInEmployee);
 	}
 
+	@RequestMapping(value = "/status/{id}", method = RequestMethod.POST)
+	public APIResponseRepresentation employeeStatusEndpoint(@PathVariable("id") int employeeId) throws UnauthenticatedAccess, UnauthorizedResourceAccess, EmployeeNotFoundException {
+		EmployeeRepresentation currentlyLoggedInEmployee = (EmployeeRepresentation)session.getAttribute("LOGGED_IN_EMPLOYEE");
+		if(currentlyLoggedInEmployee == null) {
+			throw new UnauthenticatedAccess();
+		}
+
+		return accountService.toggleEmployeeStatus(employeeId, currentlyLoggedInEmployee);
+	}
+
 	@RequestMapping(value = "/company", method = RequestMethod.GET)
 	public List<CompanyRepresentation> companyEndpoint() throws UnauthenticatedAccess {
 		EmployeeRepresentation currentlyLoggedInEmployee = (EmployeeRepresentation)session.getAttribute("LOGGED_IN_EMPLOYEE");

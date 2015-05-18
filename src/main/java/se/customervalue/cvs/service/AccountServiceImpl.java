@@ -352,6 +352,71 @@ public class AccountServiceImpl implements AccountService {
 		return employee;
 	}
 
+	@Override
+	public APIResponseRepresentation toggleEmployeeStatus(int employeeId, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, EmployeeNotFoundException {
+		Employee toggleEmployee = employeeRepository.findByEmployeeId(employeeId);
+		if(toggleEmployee == null) {
+			throw new EmployeeNotFoundException();
+		}
+
+		if(loggedInEmployee.getEmployeeId() == employeeId) {
+			throw new UnauthorizedResourceAccess();
+		}
+
+		Role adminRole = roleRepository.findByLabel("isAdmin");
+		Employee currentEmployee = employeeRepository.findByEmail(loggedInEmployee.getEmail());
+		if(currentEmployee.getRoles().contains(adminRole)) {
+			log.debug("[Account Service] Toggling employee for admin user!");
+			toggleEmployee.setIsActive(!toggleEmployee.isActive());
+			employeeRepository.save(toggleEmployee);
+			String message = "The employee account was activated! Employee has to log out and then back in for changes to take effect!";
+			if (!toggleEmployee.isActive()) {
+				message = "The employee account was deactivated! Employee has to log out and then back in for changes to take effect!";
+			}
+			return new APIResponseRepresentation("006", message);
+		}
+
+		Company managedCompany = companyRepository.findByManagingEmployee(currentEmployee);
+		Company toggleEmployeeCompany = toggleEmployee.getEmployer();
+		if(managedCompany != null && toggleEmployeeCompany != null) {
+			log.debug("[Account Service] Requesting employee is managing " + managedCompany + "! Requested employee works for " + toggleEmployeeCompany + "!");
+			List<Company> subsidiaries = companyRepository.findByParentCompany(managedCompany);
+			log.debug("[Account Service] Managed company has " + subsidiaries.size() + " subsidiaries!");
+			if(subsidiaries.size() > 0) {
+				log.debug("[Account Service] Checking all subsidiaries!");
+				for (Company subsidiary : subsidiaries) {
+					log.debug("[Account Service] \tChecking subsidiary ID " + subsidiary.getCompanyId() + " against company ID " + toggleEmployeeCompany.getCompanyId());
+					if(subsidiary.getCompanyId() == toggleEmployeeCompany.getCompanyId()) {
+						log.debug("[Account Service] Found match! :D");
+						toggleEmployee.setIsActive(!toggleEmployee.isActive());
+						employeeRepository.save(toggleEmployee);
+						String message = "The employee account was activated! Employee has to log out and then back in for changes to take effect!";
+						if (!toggleEmployee.isActive()) {
+							message = "The employee account was deactivated! Employee has to log out and then back in for changes to take effect!";
+						}
+						return new APIResponseRepresentation("006", message);
+					}
+				}
+				throw new UnauthorizedResourceAccess();
+			} else {
+				if(managedCompany.getCompanyId() != toggleEmployeeCompany.getCompanyId()) {
+					throw new UnauthorizedResourceAccess();
+				}
+
+				log.debug("[Account Service] Toggling employee for company managed by requesting employee!");
+				toggleEmployee.setIsActive(!toggleEmployee.isActive());
+				employeeRepository.save(toggleEmployee);
+				String message = "The employee account was activated! Employee has to log out and then back in for changes to take effect!";
+				if (!toggleEmployee.isActive()) {
+					message = "The employee account was deactivated! Employee has to log out and then back in for changes to take effect!";
+				}
+				return new APIResponseRepresentation("006", message);
+			}
+		} else {
+			throw new UnauthorizedResourceAccess();
+		}
+	}
+
 	@Override @Transactional
 	public List<CompanyRepresentation> getCompanies(EmployeeRepresentation loggedInEmployee) {
 		Role adminRole = roleRepository.findByLabel("isAdmin");
@@ -379,6 +444,9 @@ public class AccountServiceImpl implements AccountService {
 				log.debug("[Account Service] Retrieving company for company manager!");
 				companyList.add(new CompanyRepresentation(managedCompany));
 			}
+		} else {
+			log.debug("[Account Service] Retrieving company for employee!");
+			companyList.add(new CompanyRepresentation(currentEmployee.getEmployer()));
 		}
 
 		return companyList;

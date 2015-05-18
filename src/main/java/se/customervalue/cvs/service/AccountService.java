@@ -15,6 +15,7 @@ public interface AccountService {
 	APIResponseRepresentation activate(ActivationKeyRepresentation activationKey) throws ActivationKeyExpiredException;
 	List<EmployeeRepresentation> getEmployees(EmployeeRepresentation loggedInEmployee);
 	EmployeeRepresentation getEmployee(int employeeId, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, EmployeeNotFoundException;
+	APIResponseRepresentation toggleEmployeeStatus(int employeeId, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, EmployeeNotFoundException;
 	List<CompanyRepresentation> getCompanies(EmployeeRepresentation loggedInEmployee);
 	List<RoleRepresentation> getRoles(EmployeeRepresentation loggedInEmployee);
 	List<CountryRepresentation> getCountries();
