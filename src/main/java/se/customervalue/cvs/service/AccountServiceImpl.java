@@ -48,6 +48,15 @@ public class AccountServiceImpl implements AccountService {
 	private RoleRepository roleRepository;
 
 	@Autowired
+	private ReportRepository reportRepository;
+
+	@Autowired
+	private SalesDataRepository salesDataRepository;
+
+	@Autowired
+	private OrderHeaderRepository orderHeaderRepository;
+
+	@Autowired
 	private MailService mailService;
 
 	@Override @Transactional
@@ -254,6 +263,151 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override @Transactional
+	public APIResponseRepresentation deleteEmployee(int employeeId, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, EmployeeNotFoundException {
+		Employee deleteEmployee = employeeRepository.findByEmployeeId(employeeId);
+		if(deleteEmployee == null) {
+			throw new EmployeeNotFoundException();
+		}
+
+		if(loggedInEmployee.getEmployeeId() == employeeId) {
+			throw new UnauthorizedResourceAccess();
+		}
+
+		Role adminRole = roleRepository.findByLabel("isAdmin");
+		Employee currentEmployee = employeeRepository.findByEmail(loggedInEmployee.getEmail());
+		if(currentEmployee.getRoles().contains(adminRole)) {
+			log.debug("[Account Service] Deleting employee for admin user!");
+			List<OrderHeader> deleteEmployeeOrders = orderHeaderRepository.findByPurchasedBy(deleteEmployee);
+			List<Report> deleteEmployeeReports = reportRepository.findByReporter(deleteEmployee);
+			List<SalesData> deleteEmployeeSalesData = salesDataRepository.findByUploader(deleteEmployee);
+
+			if(deleteEmployeeOrders.size() > 0 || deleteEmployeeReports.size() > 0 || deleteEmployeeSalesData.size() > 0) {
+				log.debug("[Account Service] Employee has orders/reports/sales data attached to it! Deactivating employee for admin user!");
+				log.debug("[Account Service] Orders: " + deleteEmployeeOrders.size() + " | Reports: " + deleteEmployeeReports.size() + " | Sales Data: " + deleteEmployeeSalesData.size());
+				deleteEmployee.setIsActive(false);
+				employeeRepository.save(deleteEmployee);
+				return new APIResponseRepresentation("009","Employee has orders/reports/sales data attached to him/her! Deactivating the account instead!");
+			} else {
+				log.debug("[Account Service] Removing employee from roles!");
+				for (Role role : deleteEmployee.getRoles()) {
+					log.debug("[Account Service] Removing from role " + role.getLabel());
+					role.getEmployees().remove(deleteEmployee);
+					roleRepository.save(role);
+				}
+
+				log.debug("[Account Service] Removing all roles from employee!");
+				deleteEmployee.getRoles().clear();
+
+				Company managingCompany = companyRepository.findByManagingEmployee(deleteEmployee);
+				if(managingCompany != null) {
+					managingCompany.setManagingEmployee(null);
+					companyRepository.save(managingCompany);
+				}
+
+				if(deleteEmployee.getEmployer() != null) {
+					Company deleteEmployeEmployer = deleteEmployee.getEmployer();
+					deleteEmployeEmployer.getEmployees().remove(deleteEmployee);
+					deleteEmployee.setEmployer(null);
+					companyRepository.save(deleteEmployeEmployer);
+					employeeRepository.save(deleteEmployee);
+				}
+
+				employeeRepository.delete(deleteEmployee);
+				return new APIResponseRepresentation("009","Employee successfully deleted!");
+			}
+		}
+
+		Company managedCompany = companyRepository.findByManagingEmployee(currentEmployee);
+		Company employeeCompany = deleteEmployee.getEmployer();
+		if(managedCompany != null && employeeCompany != null) {
+			if (managedCompany.getCompanyId() == employeeCompany.getCompanyId()) {
+				log.debug("[Account Service] Deleting employee for company manager!");
+				List<OrderHeader> deleteEmployeeOrders = orderHeaderRepository.findByPurchasedBy(deleteEmployee);
+				List<Report> deleteEmployeeReports = reportRepository.findByReporter(deleteEmployee);
+				List<SalesData> deleteEmployeeSalesData = salesDataRepository.findByUploader(deleteEmployee);
+
+				if(deleteEmployeeOrders.size() > 0 || deleteEmployeeReports.size() > 0 || deleteEmployeeSalesData.size() > 0) {
+					log.debug("[Account Service] Employee has orders/reports/sales data attached to it! Deactivating employee for admin user!");
+					deleteEmployee.setIsActive(false);
+					employeeRepository.save(deleteEmployee);
+					return new APIResponseRepresentation("009","Employee has orders/reports/sales data attached to him/her! Deactivating the account instead!");
+				} else {
+					log.debug("[Account Service] Removing employee from roles!");
+					for (Role role : deleteEmployee.getRoles()) {
+						log.debug("[Account Service] Removing from role " + role.getLabel());
+						role.getEmployees().remove(deleteEmployee);
+						roleRepository.save(role);
+					}
+
+					log.debug("[Account Service] Removing all roles from employee!");
+					deleteEmployee.getRoles().clear();
+
+					Company managingCompany = companyRepository.findByManagingEmployee(deleteEmployee);
+					if(managingCompany != null) {
+						managingCompany.setManagingEmployee(null);
+						companyRepository.save(managingCompany);
+					}
+
+					employeeCompany.getEmployees().remove(deleteEmployee);
+					deleteEmployee.setEmployer(null);
+					companyRepository.save(employeeCompany);
+					employeeRepository.save(deleteEmployee);
+					employeeRepository.delete(deleteEmployee);
+					return new APIResponseRepresentation("009","Employee successfully deleted!");
+				}
+			} else {
+				List<Company> subsidiaries = companyRepository.findByParentCompany(managedCompany);
+				if (subsidiaries.size() > 0) {
+					for (Company subsidiary : subsidiaries) {
+						if (subsidiary.getCompanyId() == employeeCompany.getCompanyId()) {
+							List<OrderHeader> deleteEmployeeOrders = orderHeaderRepository.findByPurchasedBy(deleteEmployee);
+							List<Report> deleteEmployeeReports = reportRepository.findByReporter(deleteEmployee);
+							List<SalesData> deleteEmployeeSalesData = salesDataRepository.findByUploader(deleteEmployee);
+
+							if(deleteEmployeeOrders.size() > 0 || deleteEmployeeReports.size() > 0 || deleteEmployeeSalesData.size() > 0) {
+								log.debug("[Account Service] Employee has orders/reports/sales data attached to it! Deactivating employee for admin user!");
+								deleteEmployee.setIsActive(false);
+								employeeRepository.save(deleteEmployee);
+								return new APIResponseRepresentation("009","Employee has orders/reports/sales data attached to him/her! Deactivating the account instead!");
+							} else {
+								log.debug("[Account Service] Removing employee from roles!");
+								for (Role role : deleteEmployee.getRoles()) {
+									log.debug("[Account Service] Removing from role " + role.getLabel());
+									role.getEmployees().remove(deleteEmployee);
+									roleRepository.save(role);
+								}
+
+								log.debug("[Account Service] Removing all roles from employee!");
+								deleteEmployee.getRoles().clear();
+
+								Company managingCompany = companyRepository.findByManagingEmployee(deleteEmployee);
+								if(managingCompany != null) {
+									managingCompany.setManagingEmployee(null);
+									companyRepository.save(managingCompany);
+								}
+
+								employeeCompany.getEmployees().remove(deleteEmployee);
+								deleteEmployee.setEmployer(null);
+								companyRepository.save(employeeCompany);
+								employeeRepository.save(deleteEmployee);
+								employeeRepository.delete(deleteEmployee);
+								return new APIResponseRepresentation("009","Employee successfully deleted!");
+							}
+						}
+					}
+					throw new UnauthorizedResourceAccess();
+				} else {
+					log.debug("[Account Service] Attempt to delete employee working for another company than the one managend by requesting employee!");
+					throw new UnauthorizedResourceAccess();
+				}
+			}
+		} else {
+			log.debug("[Account Service] Deleting of other employees not allowed for non managers!");
+			throw new UnauthorizedResourceAccess();
+		}
+	}
+
+	@Override @Transactional
 	public APIResponseRepresentation editEmployee(BasicEmployeeRepresentation editInfo, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, EmployeeEmailAlreadyInUseException {
 		Employee possibleDuplicate = employeeRepository.findByEmail(editInfo.getEmail());
 		Employee editEmployee = employeeRepository.findByEmployeeId(editInfo.getEmployeeId());
@@ -263,7 +417,7 @@ public class AccountServiceImpl implements AccountService {
 
 		Employee currentEmployee = employeeRepository.findByEmail(loggedInEmployee.getEmail());
 		log.debug("[Account Service] Editing employee info for employeeId = " + editInfo.getEmployeeId() + " while logged in as employeeId = " + currentEmployee.getEmployeeId() + "!");
-		if(currentEmployee.getEmployeeId() == editInfo.getEmployeeId()) {
+		if (currentEmployee.getEmployeeId() == editInfo.getEmployeeId()) {
 			updateEmployee(editInfo, currentEmployee);
 			employeeRepository.save(currentEmployee);
 			return new APIResponseRepresentation("005", messageSource.getMessage("account.edit.success", null, LocaleContextHolder.getLocale()));
@@ -352,7 +506,7 @@ public class AccountServiceImpl implements AccountService {
 		return employee;
 	}
 
-	@Override
+	@Override @Transactional
 	public APIResponseRepresentation toggleEmployeeStatus(int employeeId, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, EmployeeNotFoundException {
 		Employee toggleEmployee = employeeRepository.findByEmployeeId(employeeId);
 		if(toggleEmployee == null) {
@@ -481,6 +635,90 @@ public class AccountServiceImpl implements AccountService {
 		}
 
 		return countryListRepresentations;
+	}
+
+	@Override @Transactional
+	public APIResponseRepresentation attachEmployeeToCompany(EmployeeToCompanyAttachmentRepresentation attachment, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, EmployeeNotFoundException, CompanyNotFoundException, AttachToUmbrellaCompanyException {
+		Employee employee = employeeRepository.findByEmployeeId(attachment.getEmployeeId());
+		if(employee == null) {
+			throw new EmployeeNotFoundException();
+		}
+
+		Company company = null;
+		if(attachment.getCompanyId() > 0) {
+			company = companyRepository.findByCompanyId(attachment.getCompanyId());
+			if(company == null) {
+				throw new CompanyNotFoundException();
+			}
+		}
+
+		Company employeeCompany = employee.getEmployer();
+		Role adminRole = roleRepository.findByLabel("isAdmin");
+		Employee currentEmployee = employeeRepository.findByEmail(loggedInEmployee.getEmail());
+		if(currentEmployee.getRoles().contains(adminRole)) {
+			log.debug("[Account Service] Attaching account to company for admin!");
+			if(employeeCompany != null) {
+				employeeCompany.getEmployees().remove(employee);
+				companyRepository.save(employeeCompany);
+			}
+			if(company != null) {
+				employee.setEmployer(company);
+				company.getEmployees().add(employee);
+				companyRepository.save(company);
+			} else {
+				employee.setEmployer(null);
+			}
+			employeeRepository.save(employee);
+			return new APIResponseRepresentation("007", "Employee successfully attached to new company! Logging out and then back in is required for changes to take effect!");
+		}
+
+		if(employeeCompany == null) {
+			throw new CompanyNotFoundException();
+		}
+
+		if(company != null && company.getSubsidiaries().size() > 0) {
+			throw new AttachToUmbrellaCompanyException();
+		}
+
+		boolean employeeWorksForGroup = false;
+		boolean companyBelongsToGroup = false;
+		Company managedCompany = companyRepository.findByManagingEmployee(currentEmployee);
+		if(managedCompany != null) {
+			List<Company> subsidiaries = companyRepository.findByParentCompany(managedCompany);
+			if(subsidiaries.size() > 0) {
+				log.debug("[Account Service] Retrieving all subsidiaries for group manager!");
+				for (Company subsidiary : subsidiaries) {
+					if(subsidiary.getCompanyId() == employeeCompany.getCompanyId()) {
+						employeeWorksForGroup = true;
+					}
+
+					if(company != null) {
+						if (subsidiary.getCompanyId() == company.getCompanyId()) {
+							companyBelongsToGroup = true;
+						}
+					} else {
+						companyBelongsToGroup = true;
+					}
+				}
+
+				if(employeeWorksForGroup && companyBelongsToGroup) {
+					log.debug("[Account Service] Attaching account to company for group manager!");
+					employeeCompany.getEmployees().remove(employee);
+					if(company != null) {
+						employee.setEmployer(company);
+						company.getEmployees().add(employee);
+						companyRepository.save(company);
+					} else {
+						employee.setEmployer(null);
+					}
+					employeeRepository.save(employee);
+					companyRepository.save(employeeCompany);
+					return new APIResponseRepresentation("007", "Employee successfully attached to new company! Logging out and then back in is required for changes to take effect!");
+				}
+			}
+		}
+
+		throw new UnauthorizedResourceAccess();
 	}
 
 	@Override @Transactional @Scheduled(fixedDelay=600000)

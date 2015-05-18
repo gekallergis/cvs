@@ -12,4 +12,5 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
 	Company findByRegistrationNumber(String registrationNumber);
 	List<Company> findByParentCompany(Company parentCompany);
 	Company findByManagingEmployee(Employee manager);
+	Company findByCompanyId(int companyId);
 }

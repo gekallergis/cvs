@@ -52,6 +52,16 @@ public class AccountController {
 		return accountService.activate(key);
 	}
 
+	@RequestMapping(value = "/employee/{id}", method = RequestMethod.DELETE)
+	public APIResponseRepresentation deleteEmployeeEndpoint(@PathVariable("id") int employeeId) throws UnauthenticatedAccess, UnauthorizedResourceAccess, EmployeeNotFoundException {
+		EmployeeRepresentation currentlyLoggedInEmployee = (EmployeeRepresentation)session.getAttribute("LOGGED_IN_EMPLOYEE");
+		if(currentlyLoggedInEmployee == null) {
+			throw new UnauthenticatedAccess();
+		}
+
+		return accountService.deleteEmployee(employeeId, currentlyLoggedInEmployee);
+	}
+
 	@RequestMapping(value = "/employee", method = RequestMethod.GET)
 	public List<EmployeeRepresentation> employeeEndpoint() throws UnauthenticatedAccess {
 		EmployeeRepresentation currentlyLoggedInEmployee = (EmployeeRepresentation)session.getAttribute("LOGGED_IN_EMPLOYEE");
@@ -90,6 +100,16 @@ public class AccountController {
 		}
 
 		return accountService.toggleEmployeeStatus(employeeId, currentlyLoggedInEmployee);
+	}
+
+	@RequestMapping(value = "/attachEmployeeToCompany", method = RequestMethod.POST)
+	public APIResponseRepresentation employeeStatusEndpoint(@RequestBody @Valid EmployeeToCompanyAttachmentRepresentation attachment) throws UnauthenticatedAccess, UnauthorizedResourceAccess, EmployeeNotFoundException, CompanyNotFoundException, AttachToUmbrellaCompanyException {
+		EmployeeRepresentation currentlyLoggedInEmployee = (EmployeeRepresentation)session.getAttribute("LOGGED_IN_EMPLOYEE");
+		if(currentlyLoggedInEmployee == null) {
+			throw new UnauthenticatedAccess();
+		}
+
+		return accountService.attachEmployeeToCompany(attachment, currentlyLoggedInEmployee);
 	}
 
 	@RequestMapping(value = "/company", method = RequestMethod.GET)

@@ -80,7 +80,25 @@ public class APIErrorHandler {
 
 	@ExceptionHandler(EmployeeNotFoundException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public APIResponseRepresentation employeeNotFoundExceptionHandler(Exception ex) {
+	public APIResponseRepresentation employeeNotFoundExceptionHandler(EmployeeNotFoundException ex) {
 		return new APIResponseRepresentation("111", "The requested employee was not found!");
+	}
+
+	@ExceptionHandler(CompanyNotFoundException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation employeeNotFoundExceptionHandler(CompanyNotFoundException ex) {
+		return new APIResponseRepresentation("112", "The requested company was not found!");
+	}
+
+	@ExceptionHandler(AttachToUmbrellaCompanyException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation attachToUmbrellaCopmanyExceptionHandler(AttachToUmbrellaCompanyException ex) {
+		return new APIResponseRepresentation("113", "Attaching employees to umbrella companies is not currently allowed!");
+	}
+
+	@ExceptionHandler(ProductNotFoundException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation productNotFoundExceptionHandler(ProductNotFoundException ex) {
+		return new APIResponseRepresentation("114", "Requested product was not found!");
 	}
 }

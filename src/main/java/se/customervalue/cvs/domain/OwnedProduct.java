@@ -19,6 +19,12 @@ public class OwnedProduct {
 
 	public OwnedProduct() {}
 
+	public OwnedProduct(int quantity, Company owner, Product product) {
+		this.quantity = quantity;
+		this.owner = owner;
+		this.product = product;
+	}
+
 	public Company getOwner() {
 		return owner;
 	}

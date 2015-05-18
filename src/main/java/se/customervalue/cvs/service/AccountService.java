@@ -19,8 +19,9 @@ public interface AccountService {
 	List<CompanyRepresentation> getCompanies(EmployeeRepresentation loggedInEmployee);
 	List<RoleRepresentation> getRoles(EmployeeRepresentation loggedInEmployee);
 	List<CountryRepresentation> getCountries();
-
+	APIResponseRepresentation attachEmployeeToCompany(EmployeeToCompanyAttachmentRepresentation attachment, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, EmployeeNotFoundException, CompanyNotFoundException, AttachToUmbrellaCompanyException;
 	APIResponseRepresentation editEmployee(BasicEmployeeRepresentation editInfo, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, EmployeeEmailAlreadyInUseException;
+	APIResponseRepresentation deleteEmployee(int employeeId, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, EmployeeNotFoundException;
 
 	@Scheduled
 	void cleanUpActivationKeys();
