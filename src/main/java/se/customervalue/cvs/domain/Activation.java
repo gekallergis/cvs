@@ -1,8 +1,5 @@
 package se.customervalue.cvs.domain;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import se.customervalue.cvs.common.CVSConfig;
-
 import javax.persistence.*;
 import java.util.Date;
 import java.util.UUID;

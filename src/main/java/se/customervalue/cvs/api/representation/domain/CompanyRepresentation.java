@@ -1,5 +1,6 @@
 package se.customervalue.cvs.api.representation.domain;
 
+import se.customervalue.cvs.api.representation.CompanyHierarchyRepresentation;
 import se.customervalue.cvs.domain.Company;
 
 import java.io.Serializable;
@@ -28,6 +29,8 @@ public class CompanyRepresentation implements Serializable{
 	private CompanyRepresentation parentCompany;
 
 	private BasicEmployeeRepresentation managingEmployee;
+
+	private CompanyHierarchyRepresentation hierarchy;
 
 	public CompanyRepresentation() {}
 
@@ -60,6 +63,14 @@ public class CompanyRepresentation implements Serializable{
 		this.secondaryAddress = secondaryAddress;
 		this.postcode = postcode;
 		this.city = city;
+	}
+
+	public CompanyHierarchyRepresentation getHierarchy() {
+		return hierarchy;
+	}
+
+	public void setHierarchy(CompanyHierarchyRepresentation hierarchy) {
+		this.hierarchy = hierarchy;
 	}
 
 	public int getCompanyId() {

@@ -672,6 +672,105 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override @Transactional
+	public CompanyRepresentation getCompany(int companyId, EmployeeRepresentation loggedInEmployee) throws UnauthenticatedAccess, UnauthorizedResourceAccess, CompanyNotFoundException {
+		Company company = companyRepository.findByCompanyId(companyId);
+		if(company == null) {
+			throw new CompanyNotFoundException();
+		}
+
+		Role adminRole = roleRepository.findByLabel("isAdmin");
+		Employee currentEmployee = employeeRepository.findByEmail(loggedInEmployee.getEmail());
+		if(currentEmployee.getRoles().contains(adminRole)) {
+			log.debug("[Account Service] Returning company info for admin user!");
+			CompanyRepresentation companyRepresentation = new CompanyRepresentation(company);
+			companyRepresentation.setHierarchy(generateCompanyHierarchy(company));
+			return companyRepresentation;
+		}
+
+		Company managedCompany = companyRepository.findByManagingEmployee(currentEmployee);
+		if(managedCompany != null) {
+			if(managedCompany.getCompanyId() == company.getCompanyId()) {
+				log.debug("[Account Service] Returning company info for company manager!");
+				CompanyRepresentation companyRepresentation = new CompanyRepresentation(company);
+				companyRepresentation.setHierarchy(generateCompanyHierarchy(company));
+				return companyRepresentation;
+			}
+
+			List<Company> subsidiaries = companyRepository.findByParentCompany(managedCompany);
+			if(subsidiaries.size() > 0) {
+				for (Company subsidiary : subsidiaries) {
+					if(subsidiary.getCompanyId() == company.getCompanyId()) {
+						log.debug("[Account Service] Returning company info for group manager!");
+						CompanyRepresentation companyRepresentation = new CompanyRepresentation(company);
+						companyRepresentation.setHierarchy(generateCompanyHierarchy(company));
+						return companyRepresentation;
+					}
+				}
+			}
+		} else {
+			if(currentEmployee.getEmployer().getCompanyId() == company.getCompanyId()) {
+				log.debug("[Account Service] Returning company info for company employee!");
+				CompanyRepresentation companyRepresentation = new CompanyRepresentation(company);
+				companyRepresentation.setHierarchy(generateCompanyHierarchy(company));
+				return companyRepresentation;
+			}
+		}
+
+		throw new UnauthorizedResourceAccess();
+	}
+
+	private CompanyHierarchyRepresentation generateCompanyHierarchy(Company company) {
+		CompanyHierarchyRepresentation hierarchy = new CompanyHierarchyRepresentation();
+
+		Company parentCompany = company.getParentCompany();
+		if(parentCompany == null) {
+			List<Company> subsidiaries = companyRepository.findByParentCompany(company);
+			if(subsidiaries.size() > 0) {
+				log.debug("[Account Service] Generating company hierarchy for group company!");
+				hierarchy.setCompany(new CompanyRepresentation(company));
+				List<CompanyHierarchyRepresentation> children = new ArrayList<CompanyHierarchyRepresentation>();
+				for (Company subsidiary : subsidiaries) {
+					CompanyHierarchyRepresentation childHierarchy = new CompanyHierarchyRepresentation();
+					childHierarchy.setCompany(new CompanyRepresentation(subsidiary));
+					List<EmployeeRepresentation> childEmployees = new ArrayList<EmployeeRepresentation>();
+					List<Employee> childCompanyEmployees = employeeRepository.findByEmployer(subsidiary);
+					for (Employee childCompanyEmployee : childCompanyEmployees) {
+						childEmployees.add(new EmployeeRepresentation(childCompanyEmployee));
+					}
+					childHierarchy.setEmployees(childEmployees);
+					children.add(childHierarchy);
+				}
+				hierarchy.setChildren(children);
+			} else {
+				log.debug("[Account Service] Generating company hierarchy for single company!");
+				CompanyRepresentation missingUmbrellaCompany = new CompanyRepresentation();
+				missingUmbrellaCompany.setName("No Parent Company");
+				BasicEmployeeRepresentation missingManagingAccount = new BasicEmployeeRepresentation();
+				missingManagingAccount.setFirstName("No");
+				missingManagingAccount.setLastName("Group Manager");
+				missingUmbrellaCompany.setManagingEmployee(missingManagingAccount);
+				hierarchy.setCompany(missingUmbrellaCompany);
+				List<CompanyHierarchyRepresentation> children = new ArrayList<CompanyHierarchyRepresentation>();
+				CompanyHierarchyRepresentation childHierarchy = new CompanyHierarchyRepresentation();
+				childHierarchy.setCompany(new CompanyRepresentation(company));
+				List<EmployeeRepresentation> employees = new ArrayList<EmployeeRepresentation>();
+				List<Employee> companyEmployees = employeeRepository.findByEmployer(company);
+				for (Employee employee : companyEmployees) {
+					employees.add(new EmployeeRepresentation(employee));
+				}
+				childHierarchy.setEmployees(employees);
+				children.add(childHierarchy);
+				hierarchy.setChildren(children);
+			}
+		} else {
+			log.debug("[Account Service] Generating company hierarchy for child company!");
+			hierarchy = generateCompanyHierarchy(company.getParentCompany());
+		}
+
+		return hierarchy;
+	}
+
+	@Override @Transactional
 	public List<RoleRepresentation> getRoles(EmployeeRepresentation loggedInEmployee) {
 		Role adminRole = roleRepository.findByLabel("isAdmin");
 		Employee currentEmployee = employeeRepository.findByEmail(loggedInEmployee.getEmail());
