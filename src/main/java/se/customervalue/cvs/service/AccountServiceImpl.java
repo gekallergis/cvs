@@ -635,6 +635,43 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override @Transactional
+	public APIResponseRepresentation addCompany(CompanyRegistrationInfoRepresentation newCompany, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, CompanyAlreadyExistsException {
+		boolean isGroupManager = false;
+		Role adminRole = roleRepository.findByLabel("isAdmin");
+		Employee currentEmployee = employeeRepository.findByEmail(loggedInEmployee.getEmail());
+		Company managedCompany = companyRepository.findByManagingEmployee(currentEmployee);
+		if(managedCompany != null) {
+			List<Company> subsidiaries = companyRepository.findByParentCompany(managedCompany);
+			if(subsidiaries.size() > 0) {
+				isGroupManager = true;
+			}
+		}
+
+		if(!currentEmployee.getRoles().contains(adminRole) && !isGroupManager) {
+			throw new UnauthorizedResourceAccess();
+		}
+
+		Company company;
+		Company checkCompany = companyRepository.findByRegistrationNumber(newCompany.getRegistrationNumber());
+		if(checkCompany == null) {
+			company = new Company(newCompany);
+			Country newCompanyCountry = countryRepository.findByCountryId(newCompany.getCountryId());
+			company.setCountry(newCompanyCountry);
+			if(isGroupManager) {
+				company.setParentCompany(managedCompany);
+				managedCompany.getSubsidiaries().add(company);
+				companyRepository.save(managedCompany);
+			}
+			companyRepository.save(company);
+		} else {
+			throw new CompanyAlreadyExistsException();
+		}
+
+		log.debug("[Account Service] Added new company!");
+		return new APIResponseRepresentation("011", "New company successfully added!");
+	}
+
+	@Override @Transactional
 	public List<RoleRepresentation> getRoles(EmployeeRepresentation loggedInEmployee) {
 		Role adminRole = roleRepository.findByLabel("isAdmin");
 		Employee currentEmployee = employeeRepository.findByEmail(loggedInEmployee.getEmail());

@@ -23,6 +23,7 @@ public interface AccountService {
 	APIResponseRepresentation editEmployee(BasicEmployeeRepresentation editInfo, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, EmployeeEmailAlreadyInUseException;
 	APIResponseRepresentation deleteEmployee(int employeeId, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, EmployeeNotFoundException;
 	APIResponseRepresentation addEmployee(EmployeeRegistrationInfoRepresentation newEmployee, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, EmployeeAlreadyExistsException;
+	APIResponseRepresentation addCompany(CompanyRegistrationInfoRepresentation newCompany, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, CompanyAlreadyExistsException;
 
 	@Scheduled
 	void cleanUpActivationKeys();
