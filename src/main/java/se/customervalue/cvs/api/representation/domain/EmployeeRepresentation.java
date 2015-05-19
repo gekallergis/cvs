@@ -3,10 +3,11 @@ package se.customervalue.cvs.api.representation.domain;
 import se.customervalue.cvs.domain.Employee;
 import se.customervalue.cvs.domain.Role;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EmployeeRepresentation {
+public class EmployeeRepresentation implements Serializable {
 	private int employeeId;
 
 	private String email;

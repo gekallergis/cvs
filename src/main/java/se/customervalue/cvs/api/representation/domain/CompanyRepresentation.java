@@ -2,7 +2,9 @@ package se.customervalue.cvs.api.representation.domain;
 
 import se.customervalue.cvs.domain.Company;
 
-public class CompanyRepresentation {
+import java.io.Serializable;
+
+public class CompanyRepresentation implements Serializable{
 	private int companyId;
 
 	private String registrationNumber;

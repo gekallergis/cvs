@@ -10,7 +10,7 @@ public class Transaction {
 
 	private String consumerId;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date date;
 
 	private float amount;

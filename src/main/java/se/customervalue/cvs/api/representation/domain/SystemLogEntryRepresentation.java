@@ -3,14 +3,12 @@ package se.customervalue.cvs.api.representation.domain;
 import se.customervalue.cvs.domain.SystemLogEntry;
 import se.customervalue.cvs.domain.SystemLogEntryType;
 
-import java.util.Date;
-
 public class SystemLogEntryRepresentation {
 	private int logEntryId;
 
 	private SystemLogEntryType type;
 
-	private Date timestamp;
+	private long timestamp;
 
 	private String title;
 
@@ -21,12 +19,12 @@ public class SystemLogEntryRepresentation {
 	public SystemLogEntryRepresentation(SystemLogEntry systemLogEntry) {
 		this.logEntryId = systemLogEntry.getLogEntryId();
 		this.type = systemLogEntry.getType();
-		this.timestamp = systemLogEntry.getTimestamp();
+		this.timestamp = systemLogEntry.getTimestamp().getTime() / 1000;
 		this.title = systemLogEntry.getTitle();
 		this.text = systemLogEntry.getText();
 	}
 
-	public SystemLogEntryRepresentation(int logEntryId, SystemLogEntryType type, Date timestamp, String title, String text) {
+	public SystemLogEntryRepresentation(int logEntryId, SystemLogEntryType type, long timestamp, String title, String text) {
 		this.logEntryId = logEntryId;
 		this.type = type;
 		this.timestamp = timestamp;
@@ -50,11 +48,11 @@ public class SystemLogEntryRepresentation {
 		this.type = type;
 	}
 
-	public Date getTimestamp() {
+	public long getTimestamp() {
 		return timestamp;
 	}
 
-	public void setTimestamp(Date timestamp) {
+	public void setTimestamp(long timestamp) {
 		this.timestamp = timestamp;
 	}
 

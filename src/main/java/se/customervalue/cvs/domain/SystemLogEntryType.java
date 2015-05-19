@@ -1,5 +1,7 @@
 package se.customervalue.cvs.domain;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum SystemLogEntryType
 {
 	REPORT("report"),
@@ -11,6 +13,15 @@ public enum SystemLogEntryType
 	private String descr;
 
 	SystemLogEntryType(String descr) {
+		this.descr = descr;
+	}
+
+	@JsonValue
+	public String getDescr() {
+		return descr;
+	}
+
+	public void setDescr(String descr) {
 		this.descr = descr;
 	}
 

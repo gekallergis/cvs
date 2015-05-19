@@ -2,7 +2,9 @@ package se.customervalue.cvs.api.representation.domain;
 
 import se.customervalue.cvs.domain.Role;
 
-public class RoleRepresentation {
+import java.io.Serializable;
+
+public class RoleRepresentation implements Serializable {
 	private int roleId;
 
 	private String label;

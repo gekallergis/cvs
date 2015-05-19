@@ -8,7 +8,7 @@ public class Report {
 	@Id	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int reportId;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date generatedOn;
 
 	@Lob

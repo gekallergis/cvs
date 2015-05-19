@@ -10,7 +10,7 @@ public class OrderHeader {
 	@Id	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int orderHeaderId;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date purchasedOn;
 
 	@OneToOne

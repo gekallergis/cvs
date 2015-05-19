@@ -10,7 +10,7 @@ public class Invoice {
 
 	private String invoiceNumber;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date dueDate;
 
 	private float VAT;
