@@ -263,6 +263,34 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override @Transactional
+	public APIResponseRepresentation addEmployee(EmployeeRegistrationInfoRepresentation newEmployee, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, EmployeeAlreadyExistsException {
+		Role adminRole = roleRepository.findByLabel("isAdmin");
+		Employee currentEmployee = employeeRepository.findByEmail(loggedInEmployee.getEmail());
+		Company managedCompany = companyRepository.findByManagingEmployee(currentEmployee);
+		if(!currentEmployee.getRoles().contains(adminRole) && managedCompany == null) {
+			throw new UnauthorizedResourceAccess();
+		}
+
+		Employee employee;
+		Employee checkEmployee = employeeRepository.findByEmail(newEmployee.getEmail());
+		if(checkEmployee == null) {
+			employee = new Employee(newEmployee);
+		} else {
+			throw new EmployeeAlreadyExistsException();
+		}
+
+		Activation newEmployeeActivation = new Activation();
+		newEmployeeActivation.setEmployee(employee);
+		activationRepository.save(newEmployeeActivation);
+		employeeRepository.save(employee);
+
+		mailService.send(newEmployee.getEmail(), "Welcome to CVS!", "Click <a href='" + CVSConfig.SERVICE_ENDPOINT + "activate/" + newEmployeeActivation.getActivationKey() + "'>here</a> to activate your account!");
+		log.debug("[Account Service] Added new employee!");
+
+		return new APIResponseRepresentation("010", "New employee successfully added! An email was sent to the address provided for activation!");
+	}
+
+	@Override @Transactional
 	public APIResponseRepresentation deleteEmployee(int employeeId, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, EmployeeNotFoundException {
 		Employee deleteEmployee = employeeRepository.findByEmployeeId(employeeId);
 		if(deleteEmployee == null) {

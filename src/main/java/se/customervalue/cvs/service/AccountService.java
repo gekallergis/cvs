@@ -22,6 +22,7 @@ public interface AccountService {
 	APIResponseRepresentation attachEmployeeToCompany(EmployeeToCompanyAttachmentRepresentation attachment, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, EmployeeNotFoundException, CompanyNotFoundException, AttachToUmbrellaCompanyException;
 	APIResponseRepresentation editEmployee(BasicEmployeeRepresentation editInfo, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, EmployeeEmailAlreadyInUseException;
 	APIResponseRepresentation deleteEmployee(int employeeId, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, EmployeeNotFoundException;
+	APIResponseRepresentation addEmployee(EmployeeRegistrationInfoRepresentation newEmployee, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, EmployeeAlreadyExistsException;
 
 	@Scheduled
 	void cleanUpActivationKeys();

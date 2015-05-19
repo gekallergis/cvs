@@ -72,6 +72,16 @@ public class AccountController {
 		return accountService.getEmployees(currentlyLoggedInEmployee);
 	}
 
+	@RequestMapping(value = "/employee", method = RequestMethod.PUT)
+	public APIResponseRepresentation addEmployeeEndpoint(@RequestBody @Valid EmployeeRegistrationInfoRepresentation newEmployee) throws UnauthenticatedAccess, UnauthorizedResourceAccess, EmployeeAlreadyExistsException {
+		EmployeeRepresentation currentlyLoggedInEmployee = (EmployeeRepresentation)session.getAttribute("LOGGED_IN_EMPLOYEE");
+		if(currentlyLoggedInEmployee == null) {
+			throw new UnauthenticatedAccess();
+		}
+
+		return accountService.addEmployee(newEmployee, currentlyLoggedInEmployee);
+	}
+
 	@RequestMapping(value = "/employee", method = RequestMethod.POST)
 	public APIResponseRepresentation employeeEditEndpoint(@RequestBody @Valid BasicEmployeeRepresentation editInfo) throws UnauthenticatedAccess, UnauthorizedResourceAccess, EmployeeEmailAlreadyInUseException {
 		EmployeeRepresentation currentlyLoggedInEmployee = (EmployeeRepresentation)session.getAttribute("LOGGED_IN_EMPLOYEE");
