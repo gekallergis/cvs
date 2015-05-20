@@ -238,4 +238,20 @@ public class Company {
 	public void setPostcode(String postcode) {
 		this.postcode = postcode;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(this == obj) {
+			return true;
+		}
+
+		if(obj instanceof Company) {
+			Company anotherCompany = (Company)obj;
+			if(this.companyId == anotherCompany.companyId && this.registrationNumber == anotherCompany.registrationNumber) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

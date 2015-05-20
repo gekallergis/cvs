@@ -101,4 +101,10 @@ public class APIErrorHandler {
 	public APIResponseRepresentation productNotFoundExceptionHandler(ProductNotFoundException ex) {
 		return new APIResponseRepresentation("114", "Requested product was not found!");
 	}
+
+	@ExceptionHandler(CompanyRegistrationNumberAlreadyInUseException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation productNotFoundExceptionHandler(CompanyRegistrationNumberAlreadyInUseException ex) {
+		return new APIResponseRepresentation("115", "The specified registration number is already in use by another company, please choose a different one!");
+	}
 }

@@ -152,6 +152,16 @@ public class AccountController {
 		return accountService.addCompany(newCompany, currentlyLoggedInEmployee);
 	}
 
+	@RequestMapping(value = "/company", method = RequestMethod.POST)
+	public APIResponseRepresentation companyEditEndpoint(@RequestBody @Valid BasicCompanyRepresentation editInfo) throws UnauthenticatedAccess, UnauthorizedResourceAccess, CompanyRegistrationNumberAlreadyInUseException {
+		EmployeeRepresentation currentlyLoggedInEmployee = (EmployeeRepresentation)session.getAttribute("LOGGED_IN_EMPLOYEE");
+		if(currentlyLoggedInEmployee == null) {
+			throw new UnauthenticatedAccess();
+		}
+
+		return accountService.editCompany(editInfo, currentlyLoggedInEmployee);
+	}
+
 	@RequestMapping(value = "/role", method = RequestMethod.GET)
 	public List<RoleRepresentation> roleEndpoint() throws UnauthenticatedAccess {
 		EmployeeRepresentation currentlyLoggedInEmployee = (EmployeeRepresentation)session.getAttribute("LOGGED_IN_EMPLOYEE");

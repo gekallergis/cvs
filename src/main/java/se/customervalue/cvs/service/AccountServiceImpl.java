@@ -672,7 +672,7 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override @Transactional
-	public CompanyRepresentation getCompany(int companyId, EmployeeRepresentation loggedInEmployee) throws UnauthenticatedAccess, UnauthorizedResourceAccess, CompanyNotFoundException {
+	public CompanyRepresentation getCompany(int companyId, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, CompanyNotFoundException {
 		Company company = companyRepository.findByCompanyId(companyId);
 		if(company == null) {
 			throw new CompanyNotFoundException();
@@ -768,6 +768,59 @@ public class AccountServiceImpl implements AccountService {
 		}
 
 		return hierarchy;
+	}
+
+	@Override @Transactional
+	public APIResponseRepresentation editCompany(BasicCompanyRepresentation editInfo, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, CompanyRegistrationNumberAlreadyInUseException {
+		Company possibleDuplicate = companyRepository.findByRegistrationNumber(editInfo.getRegistrationNumber());
+		Company editCompany = companyRepository.findByCompanyId(editInfo.getCompanyId());
+		if(possibleDuplicate != null && !possibleDuplicate.equals(editCompany)) {
+			throw new CompanyRegistrationNumberAlreadyInUseException();
+		}
+
+		Role adminRole = roleRepository.findByLabel("isAdmin");
+		Employee currentEmployee = employeeRepository.findByEmail(loggedInEmployee.getEmail());
+		if(currentEmployee.getRoles().contains(adminRole)) {
+			log.debug("[Account Service] Editing company info for admin user!");
+			updateCompany(editInfo, editCompany);
+			companyRepository.save(editCompany);
+			return new APIResponseRepresentation("012", "Company information successfully updated!");
+		}
+
+		Company managedCompany = companyRepository.findByManagingEmployee(currentEmployee);
+		if(managedCompany != null) {
+			List<Company> subsidiaries = companyRepository.findByParentCompany(managedCompany);
+			if(subsidiaries.size() > 0) {
+				for (Company subsidiary : subsidiaries) {
+					if(subsidiary.getCompanyId() == editCompany.getCompanyId()) {
+						log.debug("[Account Service] Editing company info for group manager!");
+						updateCompany(editInfo, editCompany);
+						companyRepository.save(editCompany);
+						return new APIResponseRepresentation("012", "Company information successfully updated!");
+					}
+				}
+			}
+		}
+
+		throw new UnauthorizedResourceAccess();
+	}
+
+	private Company updateCompany(BasicCompanyRepresentation info, Company company) {
+		company.setRegistrationNumber(info.getRegistrationNumber());
+		company.setName(info.getName());
+		company.setPrimaryAddress(info.getPrimaryAddress());
+		company.setSecondaryAddress(info.getSecondaryAddress());
+		company.setPostcode(info.getPostcode());
+		company.setCity(info.getCity());
+		company.setPhoneNumber(info.getPhoneNumber());
+
+		Country country = countryRepository.findByCountryId(info.getCountry().getCountryId());
+		Country currentCountry = countryRepository.findByCountryId(company.getCountry().getCountryId());
+		currentCountry.getCompanies().remove(company);
+		countryRepository.save(currentCountry);
+		company.setCountry(country);
+
+		return company;
 	}
 
 	@Override @Transactional
