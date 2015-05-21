@@ -18,6 +18,12 @@ public class APIErrorHandler {
 	@Autowired
 	private MessageSource messageSource;
 
+	@ExceptionHandler(UnimplementedFeatureException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation unimplementedFeatureExceptionHandler(UnimplementedFeatureException ex) {
+		return  new APIResponseRepresentation("100", "This feature has not been implemented yet! :)");
+	}
+
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public APIResponseRepresentation validationExceptionHandler(MethodArgumentNotValidException ex) {
@@ -112,5 +118,11 @@ public class APIErrorHandler {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public APIResponseRepresentation employeeNotWorkingForCompanyExceptionHandler(EmployeeNotWorkingForCompanyException ex) {
 		return new APIResponseRepresentation("116", "The specified employee does not work for the company! Currently, only employees of companies can manage them!");
+	}
+
+	@ExceptionHandler(UnsupportedCompanyHierarchyLevelException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation unsupportedCompanyHierarchyLevelExceptionHandler(UnsupportedCompanyHierarchyLevelException ex) {
+		return new APIResponseRepresentation("117", "Currently, company hierarchies can only be one level deep!");
 	}
 }

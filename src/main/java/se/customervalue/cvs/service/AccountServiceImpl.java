@@ -805,6 +805,11 @@ public class AccountServiceImpl implements AccountService {
 		throw new UnauthorizedResourceAccess();
 	}
 
+	@Override
+	public APIResponseRepresentation deleteCompany(int companyId, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, CompanyNotFoundException, UnimplementedFeatureException {
+		throw new UnimplementedFeatureException();
+	}
+
 	private Company updateCompany(BasicCompanyRepresentation info, Company company) {
 		company.setRegistrationNumber(info.getRegistrationNumber());
 		company.setName(info.getName());
@@ -938,7 +943,7 @@ public class AccountServiceImpl implements AccountService {
 		throw new UnauthorizedResourceAccess();
 	}
 
-	@Override
+	@Override @Transactional
 	public APIResponseRepresentation attachManagingEmployee(ManagingEmployeeAttachmentRepresentation attachment, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, EmployeeNotFoundException, CompanyNotFoundException, EmployeeNotWorkingForCompanyException {
 		Company company = companyRepository.findByCompanyId(attachment.getCompanyId());
 		if(company == null) {
@@ -990,6 +995,30 @@ public class AccountServiceImpl implements AccountService {
 						}
 					}
 				}
+			}
+		}
+
+		throw new UnauthorizedResourceAccess();
+	}
+
+	@Override @Transactional
+	public APIResponseRepresentation attachParentCompany(ParentCompanyAttachmentRepresentation attachment, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, CompanyNotFoundException, UnsupportedCompanyHierarchyLevelException {
+		Company company = companyRepository.findByCompanyId(attachment.getCompanyId());
+		Company parentCompany = companyRepository.findByCompanyId(attachment.getParentCompanyId());
+		if(company == null || parentCompany == null) {
+			throw new CompanyNotFoundException();
+		}
+
+		Role adminRole = roleRepository.findByLabel("isAdmin");
+		Employee currentEmployee = employeeRepository.findByEmail(loggedInEmployee.getEmail());
+		if(currentEmployee.getRoles().contains(adminRole)) {
+			log.debug("[Account Service] Attaching company for admin user!");
+			if(parentCompany.hasParentCompany()) {
+				throw new UnsupportedCompanyHierarchyLevelException();
+			} else {
+				company.setParentCompany(parentCompany);
+				companyRepository.save(company);
+				return new APIResponseRepresentation("014", "Parent company successfully attached to the company!");
 			}
 		}
 

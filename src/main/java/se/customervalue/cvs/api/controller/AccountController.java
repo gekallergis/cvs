@@ -132,6 +132,16 @@ public class AccountController {
 		return accountService.attachManagingEmployee(attachment, currentlyLoggedInEmployee);
 	}
 
+	@RequestMapping(value = "/attachParentCompany", method = RequestMethod.POST)
+	public APIResponseRepresentation parentCompanyAttachmentEndpoint(@RequestBody @Valid ParentCompanyAttachmentRepresentation attachment) throws UnauthenticatedAccess, UnauthorizedResourceAccess, CompanyNotFoundException, UnsupportedCompanyHierarchyLevelException {
+		EmployeeRepresentation currentlyLoggedInEmployee = (EmployeeRepresentation)session.getAttribute("LOGGED_IN_EMPLOYEE");
+		if(currentlyLoggedInEmployee == null) {
+			throw new UnauthenticatedAccess();
+		}
+
+		return accountService.attachParentCompany(attachment, currentlyLoggedInEmployee);
+	}
+
 	@RequestMapping(value = "/company", method = RequestMethod.GET)
 	public List<CompanyRepresentation> companyEndpoint() throws UnauthenticatedAccess {
 		EmployeeRepresentation currentlyLoggedInEmployee = (EmployeeRepresentation)session.getAttribute("LOGGED_IN_EMPLOYEE");
@@ -150,6 +160,16 @@ public class AccountController {
 		}
 
 		return accountService.getCompany(companyId, currentlyLoggedInEmployee);
+	}
+
+	@RequestMapping(value = "/company/{id}", method = RequestMethod.DELETE)
+	public APIResponseRepresentation deleteCompanyEndpoint(@PathVariable("id") int companyId) throws UnauthenticatedAccess, UnauthorizedResourceAccess, CompanyNotFoundException, UnimplementedFeatureException {
+		EmployeeRepresentation currentlyLoggedInEmployee = (EmployeeRepresentation)session.getAttribute("LOGGED_IN_EMPLOYEE");
+		if(currentlyLoggedInEmployee == null) {
+			throw new UnauthenticatedAccess();
+		}
+
+		return accountService.deleteCompany(companyId, currentlyLoggedInEmployee);
 	}
 
 	@RequestMapping(value = "/company", method = RequestMethod.PUT)
