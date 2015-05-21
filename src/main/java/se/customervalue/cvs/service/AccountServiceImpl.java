@@ -938,6 +938,64 @@ public class AccountServiceImpl implements AccountService {
 		throw new UnauthorizedResourceAccess();
 	}
 
+	@Override
+	public APIResponseRepresentation attachManagingEmployee(ManagingEmployeeAttachmentRepresentation attachment, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, EmployeeNotFoundException, CompanyNotFoundException, EmployeeNotWorkingForCompanyException {
+		Company company = companyRepository.findByCompanyId(attachment.getCompanyId());
+		if(company == null) {
+			throw new CompanyNotFoundException();
+		}
+
+		Employee employee = null;
+		if(attachment.getEmployeeId() > 0) {
+			employee = employeeRepository.findByEmployeeId(attachment.getEmployeeId());
+			if(employee == null) {
+				throw new EmployeeNotFoundException();
+			}
+		}
+
+		if(employee != null && !company.getEmployees().contains(employee)) {
+			throw new EmployeeNotWorkingForCompanyException();
+		}
+
+		Role adminRole = roleRepository.findByLabel("isAdmin");
+		Employee currentEmployee = employeeRepository.findByEmail(loggedInEmployee.getEmail());
+		if(currentEmployee.getRoles().contains(adminRole)) {
+			log.debug("[Account Service] Attaching manager for admin user!");
+			if(employee == null) {
+				company.setManagingEmployee(null);
+				companyRepository.save(company);
+				return new APIResponseRepresentation("013", "Manager successfully removed from the company!");
+			} else {
+				company.setManagingEmployee(employee);
+				companyRepository.save(company);
+				return new APIResponseRepresentation("013", "Employee successfully attached as a manager to the company!");
+			}
+		}
+
+		Company managedCompany = companyRepository.findByManagingEmployee(currentEmployee);
+		if(managedCompany != null) {
+			List<Company> subsidiaries = companyRepository.findByParentCompany(managedCompany);
+			if(subsidiaries.size() > 0) {
+				log.debug("[Account Service] Attaching manager for group manager!");
+				for (Company subsidiary : subsidiaries) {
+					if(subsidiary.getCompanyId() == company.getCompanyId()) {
+						if(employee == null) {
+							company.setManagingEmployee(null);
+							companyRepository.save(company);
+							return new APIResponseRepresentation("013", "Manager successfully removed from the company!");
+						} else {
+							company.setManagingEmployee(employee);
+							companyRepository.save(company);
+							return new APIResponseRepresentation("013", "Employee successfully attached as a manager to the company!");
+						}
+					}
+				}
+			}
+		}
+
+		throw new UnauthorizedResourceAccess();
+	}
+
 	@Override @Transactional @Scheduled(fixedDelay=600000)
 	public void cleanUpActivationKeys() {
 		Instant now = (new Date()).toInstant();

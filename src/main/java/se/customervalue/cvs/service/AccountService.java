@@ -26,6 +26,7 @@ public interface AccountService {
 	APIResponseRepresentation addCompany(CompanyRegistrationInfoRepresentation newCompany, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, CompanyAlreadyExistsException;
 	CompanyRepresentation getCompany(int companyId, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, CompanyNotFoundException;
 	APIResponseRepresentation editCompany(BasicCompanyRepresentation editInfo, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, CompanyRegistrationNumberAlreadyInUseException;
+	APIResponseRepresentation attachManagingEmployee(ManagingEmployeeAttachmentRepresentation attachment, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, EmployeeNotFoundException, CompanyNotFoundException, EmployeeNotWorkingForCompanyException;
 
 	@Scheduled
 	void cleanUpActivationKeys();

@@ -104,7 +104,13 @@ public class APIErrorHandler {
 
 	@ExceptionHandler(CompanyRegistrationNumberAlreadyInUseException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public APIResponseRepresentation productNotFoundExceptionHandler(CompanyRegistrationNumberAlreadyInUseException ex) {
+	public APIResponseRepresentation duplicateCompanyRegistrationNumberExceptionHandler(CompanyRegistrationNumberAlreadyInUseException ex) {
 		return new APIResponseRepresentation("115", "The specified registration number is already in use by another company, please choose a different one!");
+	}
+
+	@ExceptionHandler(EmployeeNotWorkingForCompanyException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation employeeNotWorkingForCompanyExceptionHandler(EmployeeNotWorkingForCompanyException ex) {
+		return new APIResponseRepresentation("116", "The specified employee does not work for the company! Currently, only employees of companies can manage them!");
 	}
 }
