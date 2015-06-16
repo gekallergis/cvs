@@ -1,53 +1,22 @@
 package se.customervalue.cvs.api.representation.domain;
 
-import se.customervalue.cvs.domain.InvoiceStatus;
-import se.customervalue.cvs.domain.OrderHeader;
-import se.customervalue.cvs.domain.OrderItem;
-
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class OrderHeaderRepresentation {
 	private int orderHeaderId;
 
-	private int invoiceId;
+	private EmployeeRepresentation purcahsedBy;
 
-	private String purcahsedBy;
-
-	private String purchasedFor;
+	private CompanyRepresentation purchasedFor;
 
 	private Date purchasedOn;
 
-	private InvoiceStatus status;
+	private InvoiceRepresentation invoice;
 
 	private List<OrderItemRepresentation> items;
 
 	public OrderHeaderRepresentation() {}
-
-	public OrderHeaderRepresentation(OrderHeader orderHeader) {
-		this.orderHeaderId = orderHeader.getOrderHeaderId();
-		this.invoiceId = orderHeader.getInvoice().getInvoiceId();
-		this.purcahsedBy = orderHeader.getPurchasedBy().getFirstName() + " " + orderHeader.getPurchasedBy().getLastName();
-		this.purchasedFor = orderHeader.getPurchasedFor().getName();
-		this.purchasedOn = orderHeader.getPurchasedOn();
-		this.status = orderHeader.getInvoice().getStatus();
-
-		List<OrderItemRepresentation> orderItemList = new ArrayList<OrderItemRepresentation>();
-		for (OrderItem orderItem : orderHeader.getOrderItems()) {
-			orderItemList.add(new OrderItemRepresentation(orderItem));
-		}
-		this.items = orderItemList;
-	}
-
-	public OrderHeaderRepresentation(int orderHeaderId, int invoiceId, String purcahsedBy, String purchasedFor, Date purchasedOn, InvoiceStatus status) {
-		this.orderHeaderId = orderHeaderId;
-		this.invoiceId = invoiceId;
-		this.purcahsedBy = purcahsedBy;
-		this.purchasedFor = purchasedFor;
-		this.purchasedOn = purchasedOn;
-		this.status = status;
-	}
 
 	public int getOrderHeaderId() {
 		return orderHeaderId;
@@ -57,27 +26,19 @@ public class OrderHeaderRepresentation {
 		this.orderHeaderId = orderHeaderId;
 	}
 
-	public int getInvoiceId() {
-		return invoiceId;
-	}
-
-	public void setInvoiceId(int invoiceId) {
-		this.invoiceId = invoiceId;
-	}
-
-	public String getPurcahsedBy() {
+	public EmployeeRepresentation getPurcahsedBy() {
 		return purcahsedBy;
 	}
 
-	public void setPurcahsedBy(String purcahsedBy) {
+	public void setPurcahsedBy(EmployeeRepresentation purcahsedBy) {
 		this.purcahsedBy = purcahsedBy;
 	}
 
-	public String getPurchasedFor() {
+	public CompanyRepresentation getPurchasedFor() {
 		return purchasedFor;
 	}
 
-	public void setPurchasedFor(String purchasedFor) {
+	public void setPurchasedFor(CompanyRepresentation purchasedFor) {
 		this.purchasedFor = purchasedFor;
 	}
 
@@ -89,12 +50,12 @@ public class OrderHeaderRepresentation {
 		this.purchasedOn = purchasedOn;
 	}
 
-	public InvoiceStatus getStatus() {
-		return status;
+	public InvoiceRepresentation getInvoice() {
+		return invoice;
 	}
 
-	public void setStatus(InvoiceStatus status) {
-		this.status = status;
+	public void setInvoice(InvoiceRepresentation invoice) {
+		this.invoice = invoice;
 	}
 
 	public List<OrderItemRepresentation> getItems() {

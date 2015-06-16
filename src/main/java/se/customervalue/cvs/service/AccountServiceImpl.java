@@ -805,7 +805,7 @@ public class AccountServiceImpl implements AccountService {
 		throw new UnauthorizedResourceAccess();
 	}
 
-	@Override
+	@Override @Transactional
 	public APIResponseRepresentation deleteCompany(int companyId, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, CompanyNotFoundException, UnimplementedFeatureException {
 		throw new UnimplementedFeatureException();
 	}

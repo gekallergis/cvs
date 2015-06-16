@@ -3,11 +3,15 @@ package se.customervalue.cvs.api.representation.domain;
 import se.customervalue.cvs.domain.OrderItem;
 
 public class OrderItemRepresentation {
+	private int productId;
+
 	private String name;
 
 	private int quantity;
 
 	private float unitPrice;
+
+	private String info;
 
 	public OrderItemRepresentation() {}
 
@@ -21,6 +25,14 @@ public class OrderItemRepresentation {
 		this.name = name;
 		this.quantity = quantity;
 		this.unitPrice = unitPrice;
+	}
+
+	public int getProductId() {
+		return productId;
+	}
+
+	public void setProductId(int productId) {
+		this.productId = productId;
 	}
 
 	public String getName() {
@@ -45,5 +57,13 @@ public class OrderItemRepresentation {
 
 	public void setUnitPrice(float unitPrice) {
 		this.unitPrice = unitPrice;
+	}
+
+	public String getInfo() {
+		return info;
+	}
+
+	public void setInfo(String info) {
+		this.info = info;
 	}
 }

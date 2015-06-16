@@ -125,4 +125,10 @@ public class APIErrorHandler {
 	public APIResponseRepresentation unsupportedCompanyHierarchyLevelExceptionHandler(UnsupportedCompanyHierarchyLevelException ex) {
 		return new APIResponseRepresentation("117", "Currently, company hierarchies can only be one level deep!");
 	}
+
+	@ExceptionHandler(UnpaidInvoiceQuotaReached.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation unpaidInvoiceQuotaReachedExceptionHandler(UnpaidInvoiceQuotaReached ex) {
+		return new APIResponseRepresentation("118", "The company has reached its unpaid invoice quota! Please contact customer support!");
+	}
 }
