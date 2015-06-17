@@ -1,22 +1,40 @@
 package se.customervalue.cvs.api.representation.domain;
 
+import se.customervalue.cvs.domain.OrderHeader;
+import se.customervalue.cvs.domain.OrderItem;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class OrderHeaderRepresentation {
 	private int orderHeaderId;
 
-	private EmployeeRepresentation purcahsedBy;
+	private EmployeeRepresentation purchasedBy;
 
 	private CompanyRepresentation purchasedFor;
 
-	private Date purchasedOn;
+	private String purchasedOn;
 
 	private InvoiceRepresentation invoice;
 
 	private List<OrderItemRepresentation> items;
 
 	public OrderHeaderRepresentation() {}
+
+	public OrderHeaderRepresentation(OrderHeader orderHeader) {
+		this.orderHeaderId = orderHeader.getOrderHeaderId();
+		this.purchasedBy = new EmployeeRepresentation(orderHeader.getPurchasedBy());
+		this.purchasedFor = new CompanyRepresentation(orderHeader.getPurchasedFor());
+		this.purchasedOn = orderHeader.getPurchasedOn().toString();
+		this.invoice = new InvoiceRepresentation(orderHeader.getInvoice());
+
+		List<OrderItemRepresentation> orderItemList = new ArrayList<OrderItemRepresentation>();
+		for (OrderItem orderItem : orderHeader.getOrderItems()) {
+			orderItemList.add(new OrderItemRepresentation(orderItem));
+		}
+		this.items = orderItemList;
+	}
 
 	public int getOrderHeaderId() {
 		return orderHeaderId;
@@ -26,12 +44,12 @@ public class OrderHeaderRepresentation {
 		this.orderHeaderId = orderHeaderId;
 	}
 
-	public EmployeeRepresentation getPurcahsedBy() {
-		return purcahsedBy;
+	public EmployeeRepresentation getPurchasedBy() {
+		return purchasedBy;
 	}
 
-	public void setPurcahsedBy(EmployeeRepresentation purcahsedBy) {
-		this.purcahsedBy = purcahsedBy;
+	public void setPurchasedBy(EmployeeRepresentation purchasedBy) {
+		this.purchasedBy = purchasedBy;
 	}
 
 	public CompanyRepresentation getPurchasedFor() {
@@ -42,11 +60,11 @@ public class OrderHeaderRepresentation {
 		this.purchasedFor = purchasedFor;
 	}
 
-	public Date getPurchasedOn() {
+	public String getPurchasedOn() {
 		return purchasedOn;
 	}
 
-	public void setPurchasedOn(Date purchasedOn) {
+	public void setPurchasedOn(String purchasedOn) {
 		this.purchasedOn = purchasedOn;
 	}
 

@@ -131,4 +131,16 @@ public class APIErrorHandler {
 	public APIResponseRepresentation unpaidInvoiceQuotaReachedExceptionHandler(UnpaidInvoiceQuotaReached ex) {
 		return new APIResponseRepresentation("118", "The company has reached its unpaid invoice quota! Please contact customer support!");
 	}
+
+	@ExceptionHandler(NotEnoughOwnedProductsException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation notEnoughOwnedProductsExceptionHandler(NotEnoughOwnedProductsException ex) {
+		return new APIResponseRepresentation("119", "There are not enough products available to refund this order!");
+	}
+
+	@ExceptionHandler(OrderNotFoundException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation orderNotFoundExceptionHandler(OrderNotFoundException ex) {
+		return new APIResponseRepresentation("120", "The requested order was not found!");
+	}
 }
