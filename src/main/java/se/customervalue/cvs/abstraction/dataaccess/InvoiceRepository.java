@@ -6,4 +6,6 @@ import se.customervalue.cvs.domain.Invoice;
 import javax.transaction.Transactional;
 
 @Transactional
-public interface InvoiceRepository extends JpaRepository<Invoice, Long> {}
+public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
+	Invoice findByInvoiceId(int invoiceId);
+}

@@ -143,4 +143,10 @@ public class APIErrorHandler {
 	public APIResponseRepresentation orderNotFoundExceptionHandler(OrderNotFoundException ex) {
 		return new APIResponseRepresentation("120", "The requested order was not found!");
 	}
+
+	@ExceptionHandler(InvoiceNotFoundException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation invoiceNotFoundExceptionHandler(InvoiceNotFoundException ex) {
+		return new APIResponseRepresentation("121", "The requested invoice was not found!");
+	}
 }

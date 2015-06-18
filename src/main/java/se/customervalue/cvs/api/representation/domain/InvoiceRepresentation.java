@@ -13,7 +13,7 @@ public class InvoiceRepresentation {
 
 	private String invoiceNumber;
 
-	private Date dueDate;
+	private String dueDate;
 
 	private BasicCompanyRepresentation company;
 
@@ -30,7 +30,7 @@ public class InvoiceRepresentation {
 	public InvoiceRepresentation(Invoice invoice) {
 		this.invoiceId = invoice.getInvoiceId();
 		this.invoiceNumber = invoice.getInvoiceNumber();
-		this.dueDate = invoice.getDueDate();
+		this.dueDate = invoice.getDueDate().toString();
 		this.company = new BasicCompanyRepresentation(invoice.getOrder().getPurchasedFor());
 		this.purchaser = new BasicEmployeeRepresentation(invoice.getOrder().getPurchasedBy());
 
@@ -49,7 +49,7 @@ public class InvoiceRepresentation {
 		this.status = status;
 		this.invoiceId = invoiceId;
 		this.invoiceNumber = invoiceNumber;
-		this.dueDate = dueDate;
+		this.dueDate = dueDate.toString();
 	}
 
 	public int getInvoiceId() {
@@ -68,12 +68,12 @@ public class InvoiceRepresentation {
 		this.invoiceNumber = invoiceNumber;
 	}
 
-	public Date getDueDate() {
+	public String getDueDate() {
 		return dueDate;
 	}
 
 	public void setDueDate(Date dueDate) {
-		this.dueDate = dueDate;
+		this.dueDate = dueDate.toString();
 	}
 
 	public BasicCompanyRepresentation getCompany() {
