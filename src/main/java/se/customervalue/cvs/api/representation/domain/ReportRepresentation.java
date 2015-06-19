@@ -16,7 +16,7 @@ public class ReportRepresentation {
 
 	private String generatedFor;
 
-	private Date generatedOn;
+	private String generatedOn;
 
 	private String filePath;
 
@@ -30,7 +30,7 @@ public class ReportRepresentation {
 		this.salesPeriod = report.getSalesData().getSalesPeriod();
 		this.generatedBy = report.getReporter().getFirstName() + " " + report.getReporter().getLastName();
 		this.generatedFor = report.getCompany().getName();
-		this.generatedOn = report.getGeneratedOn();
+		this.generatedOn = report.getGeneratedOn().toString();
 		this.filePath = report.getFilePath();
 		this.status = report.getStatus();
 	}
@@ -41,7 +41,7 @@ public class ReportRepresentation {
 		this.salesPeriod = salesPeriod;
 		this.generatedBy = generatedBy;
 		this.generatedFor = generatedFor;
-		this.generatedOn = generatedOn;
+		this.generatedOn = generatedOn.toString();
 		this.filePath = filePath;
 		this.status = status;
 	}
@@ -86,11 +86,11 @@ public class ReportRepresentation {
 		this.generatedFor = generatedFor;
 	}
 
-	public Date getGeneratedOn() {
+	public String getGeneratedOn() {
 		return generatedOn;
 	}
 
-	public void setGeneratedOn(Date generatedOn) {
+	public void setGeneratedOn(String generatedOn) {
 		this.generatedOn = generatedOn;
 	}
 

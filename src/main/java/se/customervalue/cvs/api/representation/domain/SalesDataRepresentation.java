@@ -10,7 +10,7 @@ public class SalesDataRepresentation {
 
 	private String salesPeriod;
 
-	private Date uploadedOn;
+	private String uploadedOn;
 
 	private BasicEmployeeRepresentation uploadedBy;
 
@@ -25,7 +25,7 @@ public class SalesDataRepresentation {
 	public SalesDataRepresentation(SalesData salesData) {
 		this.salesDataId = salesData.getSalesDataId();
 		this.salesPeriod = salesData.getSalesPeriod();
-		this.uploadedOn = salesData.getUploadedOn();
+		this.uploadedOn = salesData.getUploadedOn().toString();
 		this.uploadedBy = new BasicEmployeeRepresentation(salesData.getUploader());
 		this.uploadedFor = new BasicCompanyRepresentation(salesData.getCompany());
 		this.filePath = salesData.getFilePath();
@@ -35,7 +35,7 @@ public class SalesDataRepresentation {
 	public SalesDataRepresentation(int salesDataId, String salesPeriod, Date uploadedOn, String filePath, SalesDataStatus status) {
 		this.salesDataId = salesDataId;
 		this.salesPeriod = salesPeriod;
-		this.uploadedOn = uploadedOn;
+		this.uploadedOn = uploadedOn.toString();
 		this.filePath = filePath;
 		this.status = status;
 	}
@@ -56,11 +56,11 @@ public class SalesDataRepresentation {
 		this.salesPeriod = salesPeriod;
 	}
 
-	public Date getUploadedOn() {
+	public String getUploadedOn() {
 		return uploadedOn;
 	}
 
-	public void setUploadedOn(Date uploadedOn) {
+	public void setUploadedOn(String uploadedOn) {
 		this.uploadedOn = uploadedOn;
 	}
 

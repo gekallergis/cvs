@@ -9,6 +9,7 @@ import se.customervalue.cvs.api.exception.*;
 import se.customervalue.cvs.api.representation.APIResponseRepresentation;
 import se.customervalue.cvs.api.representation.FreeProductRepresentation;
 import se.customervalue.cvs.api.representation.domain.EmployeeRepresentation;
+import se.customervalue.cvs.api.representation.domain.OwnedProductRepresentation;
 import se.customervalue.cvs.api.representation.domain.ProductRepresentation;
 import se.customervalue.cvs.domain.*;
 
@@ -43,6 +44,44 @@ public class ProductServiceImpl implements ProductService {
 			productList.add(new ProductRepresentation(product));
 		}
 		return productList;
+	}
+
+	@Override
+	public List<OwnedProductRepresentation> getOwnedProducts(EmployeeRepresentation loggedInEmployee) {
+		List<OwnedProduct> ownedProducts = new ArrayList<OwnedProduct>();
+		List<OwnedProductRepresentation> ownedProductsRep = new ArrayList<OwnedProductRepresentation>();
+
+		Role adminRole = roleRepository.findByLabel("isAdmin");
+		Employee currentEmployee = employeeRepository.findByEmail(loggedInEmployee.getEmail());
+		Company managedCompany = companyRepository.findByManagingEmployee(currentEmployee);
+		if(currentEmployee.getRoles().contains(adminRole)) {
+			log.debug("[Product Service] Getting all owned products for admin user!");
+			ownedProducts.addAll(ownedProductRepository.findAll());
+		} else if (managedCompany != null){
+			ownedProducts.addAll(ownedProductRepository.findByOwner(managedCompany));
+
+			List<Company> subsidiaries = companyRepository.findByParentCompany(managedCompany);
+			if(subsidiaries.size() > 0) {
+				for (Company subsidiary : subsidiaries) {
+					ownedProducts.addAll(ownedProductRepository.findByOwner(subsidiary));
+				}
+			} else {
+				if(managedCompany.hasParentCompany()) {
+					ownedProducts.addAll(ownedProductRepository.findByOwner(managedCompany.getParentCompany()));
+				}
+			}
+		} else {
+			ownedProducts.addAll(ownedProductRepository.findByOwner(currentEmployee.getEmployer()));
+			if(currentEmployee.getEmployer().hasParentCompany()) {
+				ownedProducts.addAll(ownedProductRepository.findByOwner(currentEmployee.getEmployer().getParentCompany()));
+			}
+		}
+
+		for (OwnedProduct ownedProduct : ownedProducts) {
+			ownedProductsRep.add(new OwnedProductRepresentation(ownedProduct));
+		}
+
+		return ownedProductsRep;
 	}
 
 	@Override @Transactional

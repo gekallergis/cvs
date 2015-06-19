@@ -120,7 +120,7 @@ public class OrderServiceImpl implements OrderService {
 		companyRepository.save(purchasedFor);
 		employeeRepository.save(purchasedBy);
 
-		return new APIResponseRepresentation("015", "You order has been placed, you can see the invoice issued for you here!");
+		return new APIResponseRepresentation("015", "You order has been placed, you can see the invoice issued for you here!", String.valueOf(newOrder.getInvoice().getInvoiceId()));
 	}
 
 	private float calculateTotalCost(OrderHeader order) {

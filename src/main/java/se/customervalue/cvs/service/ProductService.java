@@ -7,11 +7,13 @@ import se.customervalue.cvs.api.exception.UnauthorizedResourceAccess;
 import se.customervalue.cvs.api.representation.APIResponseRepresentation;
 import se.customervalue.cvs.api.representation.FreeProductRepresentation;
 import se.customervalue.cvs.api.representation.domain.EmployeeRepresentation;
+import se.customervalue.cvs.api.representation.domain.OwnedProductRepresentation;
 import se.customervalue.cvs.api.representation.domain.ProductRepresentation;
 
 import java.util.List;
 
 public interface ProductService {
 	List<ProductRepresentation> getProducts();
+	List<OwnedProductRepresentation> getOwnedProducts(EmployeeRepresentation loggedInEmployee);
 	APIResponseRepresentation addFreeProducts(FreeProductRepresentation freeProduct, EmployeeRepresentation loggedInEmployee) throws UnauthenticatedAccess, UnauthorizedResourceAccess, ProductNotFoundException, CompanyNotFoundException;
 }

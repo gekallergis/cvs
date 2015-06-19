@@ -98,7 +98,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 		}
 
 		if(currentEmployee.getRoles().contains(adminRole)) {
-			log.debug("[Invoice Service] Retrieving invoice for admin user!");
+			log.debug("[Invoice Service] Retrieving invoice " + invoiceId + " for admin user!");
 		} else {
 			if(managedCompany != null) {
 				Company invoiceCompany = requestedInvoice.getOrder().getPurchasedFor();
