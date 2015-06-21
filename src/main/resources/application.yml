@@ -44,6 +44,13 @@ spring.jpa:
 #        name: nginx
 #        password: nginxtsopou
 
+# Data Upload Size
+multipart:
+    maxFileSize: 512Mb
+    maxRequestSize: 515Mb
+    location: "c:/cvs/temp"
+    fileSizeThreshold: 16Mb
+
 # Logging Configuration
 logging:
     file: log/system.log

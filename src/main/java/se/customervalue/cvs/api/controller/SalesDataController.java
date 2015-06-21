@@ -3,8 +3,11 @@ package se.customervalue.cvs.api.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import se.customervalue.cvs.api.exception.UnauthenticatedAccess;
+import se.customervalue.cvs.api.representation.APIResponseRepresentation;
 import se.customervalue.cvs.api.representation.domain.EmployeeRepresentation;
 import se.customervalue.cvs.api.representation.domain.SalesDataRepresentation;
 import se.customervalue.cvs.service.SalesDataService;
@@ -28,5 +31,15 @@ public class SalesDataController {
 		}
 
 		return salesDataService.getSalesData(currentlyLoggedInEmployee);
+	}
+
+	@RequestMapping(value = "/salesdata", method = RequestMethod.POST)
+	public APIResponseRepresentation uploadSalesDataEndpoint(@RequestParam("salesData") MultipartFile salesData, @RequestParam("uploadFor") int companyId, @RequestParam("periodMonth") String month, @RequestParam("periodYear") String year) throws UnauthenticatedAccess {
+		EmployeeRepresentation currentlyLoggedInEmployee = (EmployeeRepresentation)session.getAttribute("LOGGED_IN_EMPLOYEE");
+		if(currentlyLoggedInEmployee == null) {
+			throw new UnauthenticatedAccess();
+		}
+
+		return salesDataService.uploadSalesData(salesData, companyId, month, year, currentlyLoggedInEmployee);
 	}
 }

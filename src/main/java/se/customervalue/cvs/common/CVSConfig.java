@@ -19,6 +19,15 @@ public final class CVSConfig  {
 	// Default VAT for purchases.
 	public static final float DEFAULT_VAT = 15.0f;
 
+	// Default sales data filesystem storage
+	public static final String SALES_DATA_FS_STORE = "c:/cvs/salesData";
+
+	// Default reports filesystem storage
+	public static final String REPORTS_FS_STORE = "c:/cvs/reports";
+
+	// Default temporary filesystem storage
+	public static final String TEMP_FS_STORE = "c:/cvs/temp";
+
 	private CVSConfig(){
 		// This prevents instantiation of this class by mistake!
 		throw new AssertionError();

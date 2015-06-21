@@ -680,7 +680,7 @@ public class Application extends WebMvcConfigurerAdapter implements CommandLineR
 		SalesData salesData1 = new SalesData("March 2014", SalesDataStatus.CHECKED, new Date(), "");
 		SalesData salesData2 = new SalesData("February 2014", SalesDataStatus.ERROR, new Date(), "");
 		SalesData salesData3 = new SalesData("July 2014", SalesDataStatus.PROCESSING, new Date(), "");
-		SalesData salesData4 = new SalesData("January 2015", SalesDataStatus.RECEIVED, new Date(), "");
+		SalesData salesData4 = new SalesData("January 2015", SalesDataStatus.REPLACED, new Date(), "");
 		salesDataRepository.save(salesData1);
 		salesDataRepository.save(salesData2);
 		salesDataRepository.save(salesData3);

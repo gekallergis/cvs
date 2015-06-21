@@ -2,10 +2,11 @@ package se.customervalue.cvs.domain;
 
 public enum SalesDataStatus
 {
-	RECEIVED("received"),
 	PROCESSING("processing"),
 	CHECKED("checked"),
-	ERROR("error");
+	ERROR("error"),
+	REPLACED("replaced"),
+	DELETED("deleted");
 
 	private String descr;
 

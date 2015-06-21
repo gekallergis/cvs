@@ -4,18 +4,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import se.customervalue.cvs.abstraction.dataaccess.CompanyRepository;
 import se.customervalue.cvs.abstraction.dataaccess.EmployeeRepository;
 import se.customervalue.cvs.abstraction.dataaccess.RoleRepository;
 import se.customervalue.cvs.abstraction.dataaccess.SalesDataRepository;
+import se.customervalue.cvs.api.representation.APIResponseRepresentation;
 import se.customervalue.cvs.api.representation.domain.EmployeeRepresentation;
 import se.customervalue.cvs.api.representation.domain.SalesDataRepresentation;
+import se.customervalue.cvs.common.CVSConfig;
 import se.customervalue.cvs.domain.Company;
 import se.customervalue.cvs.domain.Employee;
 import se.customervalue.cvs.domain.Role;
 import se.customervalue.cvs.domain.SalesData;
 
 import javax.transaction.Transactional;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,5 +78,24 @@ public class SalesDataServiceImpl implements SalesDataService {
 		}
 
 		return salesDataRep;
+	}
+
+	@Override @Transactional
+	public APIResponseRepresentation uploadSalesData(MultipartFile salesData, int companyId, String year, String month, EmployeeRepresentation loggedInEmployee) {
+
+//		try {
+//			String filename = salesData.getOriginalFilename();
+//			String directory = CVSConfig.SALES_DATA_FS_STORE;
+//			String filepath = Paths.get(directory, filename).toString();
+//
+//			BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(new File(filepath)));
+//			stream.write(salesData.getBytes());
+//			stream.close();
+//		}
+//		catch (Exception e) {
+//			// Throw an exception to inform the user through the API
+//		}
+
+		return new APIResponseRepresentation("018", "File Uploaded!");
 	}
 }
