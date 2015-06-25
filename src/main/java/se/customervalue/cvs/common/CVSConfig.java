@@ -28,6 +28,9 @@ public final class CVSConfig  {
 	// Default temporary filesystem storage
 	public static final String TEMP_FS_STORE = "c:/cvs/temp";
 
+	public static final String[] months = {"","January","February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+
+
 	private CVSConfig(){
 		// This prevents instantiation of this class by mistake!
 		throw new AssertionError();

@@ -149,4 +149,28 @@ public class APIErrorHandler {
 	public APIResponseRepresentation invoiceNotFoundExceptionHandler(InvoiceNotFoundException ex) {
 		return new APIResponseRepresentation("121", "The requested invoice was not found!");
 	}
+
+	@ExceptionHandler(FoundActiveProcessingException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation foundActiveProcessingExceptionHandler(FoundActiveProcessingException ex) {
+		return new APIResponseRepresentation("122", "", "", "A file has already been uploaded and being processed!");
+	}
+
+	@ExceptionHandler(SalesDataUploadException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation salesDataUploadExceptionHandler(SalesDataUploadException ex) {
+		return new APIResponseRepresentation("123", "", "", "There was a problem uploading the file! Please try again later!");
+	}
+
+	@ExceptionHandler(InvalidEmployeeCompanyCombinationException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation invalidEmployeeCompanyCombinationExceptionHandler(InvalidEmployeeCompanyCombinationException ex) {
+		return new APIResponseRepresentation("124", "", "", "Current employee cannot upload for the selected company!");
+	}
+
+	@ExceptionHandler(SalesDataDeleteException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation SalesDataDeleteExceptionHandler(SalesDataDeleteException ex) {
+		return new APIResponseRepresentation("125", "There was an error removing the sales data file! Please contact customer support!");
+	}
 }

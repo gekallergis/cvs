@@ -9,21 +9,19 @@ import se.customervalue.cvs.abstraction.dataaccess.CompanyRepository;
 import se.customervalue.cvs.abstraction.dataaccess.EmployeeRepository;
 import se.customervalue.cvs.abstraction.dataaccess.RoleRepository;
 import se.customervalue.cvs.abstraction.dataaccess.SalesDataRepository;
+import se.customervalue.cvs.api.exception.*;
 import se.customervalue.cvs.api.representation.APIResponseRepresentation;
 import se.customervalue.cvs.api.representation.domain.EmployeeRepresentation;
 import se.customervalue.cvs.api.representation.domain.SalesDataRepresentation;
 import se.customervalue.cvs.common.CVSConfig;
-import se.customervalue.cvs.domain.Company;
-import se.customervalue.cvs.domain.Employee;
-import se.customervalue.cvs.domain.Role;
-import se.customervalue.cvs.domain.SalesData;
+import se.customervalue.cvs.domain.*;
 
 import javax.transaction.Transactional;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -81,21 +79,107 @@ public class SalesDataServiceImpl implements SalesDataService {
 	}
 
 	@Override @Transactional
-	public APIResponseRepresentation uploadSalesData(MultipartFile salesData, int companyId, String year, String month, EmployeeRepresentation loggedInEmployee) {
+	public APIResponseRepresentation uploadSalesData(MultipartFile salesData, int companyId, String month, String year, EmployeeRepresentation loggedInEmployee) throws InvalidEmployeeCompanyCombinationException, FoundActiveProcessingException, SalesDataUploadException {
+		Role adminRole = roleRepository.findByLabel("isAdmin");
+		Employee currentEmployee = employeeRepository.findByEmail(loggedInEmployee.getEmail());
+		Company managedCompany = companyRepository.findByManagingEmployee(currentEmployee);
+		Company company = companyRepository.findByCompanyId(companyId);
+		if(currentEmployee.getRoles().contains(adminRole)) {
+			log.debug("[Sales Data Service] Uploading sales data for admin user!");
+		} else if (managedCompany != null) {
+			List<Company> subsidiaries = companyRepository.findByParentCompany(managedCompany);
+			if(subsidiaries.size() > 0) {
+				if(!subsidiaries.contains(company) && !managedCompany.equals(company)) {
+					throw new InvalidEmployeeCompanyCombinationException();
+				}
+			} else {
+				if(!managedCompany.equals(company)) {
+					throw new InvalidEmployeeCompanyCombinationException();
+				}
+			}
+		} else {
+			if(!currentEmployee.getEmployer().equals(company)) {
+				throw new InvalidEmployeeCompanyCombinationException();
+			}
+		}
 
-//		try {
-//			String filename = salesData.getOriginalFilename();
-//			String directory = CVSConfig.SALES_DATA_FS_STORE;
-//			String filepath = Paths.get(directory, filename).toString();
-//
-//			BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(new File(filepath)));
-//			stream.write(salesData.getBytes());
-//			stream.close();
-//		}
-//		catch (Exception e) {
-//			// Throw an exception to inform the user through the API
-//		}
+		List<SalesData> companySalesDataProcessing = salesDataRepository.findByCompanyAndSalesPeriodAndStatus(company, CVSConfig.months[Integer.parseInt(month)] + " " + year, SalesDataStatus.PROCESSING);
+		if(companySalesDataProcessing.size() > 0) {
+			throw new FoundActiveProcessingException();
+		}
 
-		return new APIResponseRepresentation("018", "File Uploaded!");
+		SalesData newSalesData = null;
+		try {
+			// Create new entry
+			newSalesData = new SalesData(CVSConfig.months[Integer.parseInt(month)] + " " + year, SalesDataStatus.PROCESSING, new Date(), "");
+			newSalesData.setUploader(currentEmployee);
+			currentEmployee .getSalesDataUploads().add(newSalesData);
+			newSalesData.setCompany(company);
+			company.getSalesData().add(newSalesData);
+			salesDataRepository.save(newSalesData);
+
+			/// Upload file
+			String filename = newSalesData.getSalesDataId() + "";
+			String directory = CVSConfig.SALES_DATA_FS_STORE;
+			String filepath = Paths.get(directory, filename).toString();
+			BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(new File(filepath)));
+			stream.write(salesData.getBytes());
+			stream.close();
+
+			newSalesData.setFilePath(filepath);
+
+			List<SalesData> companySalesDataChecked = salesDataRepository.findByCompanyAndSalesPeriodAndStatus(company, CVSConfig.months[Integer.parseInt(month)] + " " + year, SalesDataStatus.CHECKED);
+			if (companySalesDataChecked.size() == 1) {
+				companySalesDataChecked.get(0).setStatus(SalesDataStatus.REPLACED);
+			}
+		} catch (IOException ex) {
+			if(newSalesData != null) {
+				salesDataRepository.delete(newSalesData);
+			}
+			throw new SalesDataUploadException();
+		} finally {
+			// Initiate file checking here!
+		}
+
+		return new APIResponseRepresentation("018", "File uploaded successfully!");
+	}
+
+	@Override
+	public APIResponseRepresentation deleteSalesData(int salesDataId, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, SalesDataDeleteException {
+		Role adminRole = roleRepository.findByLabel("isAdmin");
+		Employee currentEmployee = employeeRepository.findByEmail(loggedInEmployee.getEmail());
+		Company managedCompany = companyRepository.findByManagingEmployee(currentEmployee);
+		SalesData deleteSalesData = salesDataRepository.findBySalesDataId(salesDataId);
+		if(currentEmployee.getRoles().contains(adminRole)) {
+			log.debug("[Sales Data Service] Deleting sales data for admin user!");
+		} else if (managedCompany != null) {
+			List<Company> subsidiaries = companyRepository.findByParentCompany(managedCompany);
+			if(subsidiaries.size() > 0) {
+				if(!subsidiaries.contains(deleteSalesData.getCompany()) && !managedCompany.equals(deleteSalesData.getCompany())) {
+					throw new UnauthorizedResourceAccess();
+				}
+			} else {
+				if(!managedCompany.equals(deleteSalesData.getCompany())) {
+					throw new UnauthorizedResourceAccess();
+				}
+			}
+		} else {
+			if(!currentEmployee.getEmployer().equals(deleteSalesData.getCompany())) {
+				throw new UnauthorizedResourceAccess();
+			}
+		}
+
+		try {
+			String filename = deleteSalesData.getSalesDataId() + "";
+			String directory = CVSConfig.SALES_DATA_FS_STORE;
+			Files.delete(Paths.get(directory, filename));
+		} catch (IOException ex) {
+			throw new SalesDataDeleteException();
+		} finally {
+			deleteSalesData.setStatus(SalesDataStatus.DELETED);
+			salesDataRepository.save(deleteSalesData);
+		}
+
+		return new APIResponseRepresentation("019", "Sales data marked as deleted! All files were successfully removed!");
 	}
 }

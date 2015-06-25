@@ -4,6 +4,7 @@ public class APIResponseRepresentation {
 	private String code;
 	private String message;
 	private String extra;
+	private String error;
 
 	public APIResponseRepresentation() {}
 
@@ -16,6 +17,12 @@ public class APIResponseRepresentation {
 		this.code = code;
 		this.message = message;
 		this.extra = extra;
+	}
+
+	public APIResponseRepresentation(String code, String message, String extra, String error) {
+		this.code = code;
+		this.message = message;
+		this.error = error;
 	}
 
 	public String getCode() {
@@ -40,5 +47,13 @@ public class APIResponseRepresentation {
 
 	public void setExtra(String extra) {
 		this.extra = extra;
+	}
+
+	public String getError() {
+		return error;
+	}
+
+	public void setError(String error) {
+		this.error = error;
 	}
 }
