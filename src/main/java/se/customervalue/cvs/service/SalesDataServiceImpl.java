@@ -119,7 +119,7 @@ public class SalesDataServiceImpl implements SalesDataService {
 			salesDataRepository.save(newSalesData);
 
 			/// Upload file
-			String filename = newSalesData.getSalesDataId() + "";
+			String filename = newSalesData.getSalesDataId() + ".txt";
 			String directory = CVSConfig.SALES_DATA_FS_STORE;
 			String filepath = Paths.get(directory, filename).toString();
 			BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(new File(filepath)));
@@ -133,13 +133,11 @@ public class SalesDataServiceImpl implements SalesDataService {
 				companySalesDataChecked.get(0).setStatus(SalesDataStatus.REPLACED);
 			}
 		} catch (IOException ex) {
-			if(newSalesData != null) {
-				salesDataRepository.delete(newSalesData);
-			}
+			salesDataRepository.delete(newSalesData);
 			throw new SalesDataUploadException();
-		} finally {
+		}// finally {
 			// Initiate file checking here!
-		}
+		//}
 
 		return new APIResponseRepresentation("018", "File uploaded successfully!");
 	}
@@ -170,7 +168,7 @@ public class SalesDataServiceImpl implements SalesDataService {
 		}
 
 		try {
-			String filename = deleteSalesData.getSalesDataId() + "";
+			String filename = deleteSalesData.getSalesDataId() + ".txt";
 			String directory = CVSConfig.SALES_DATA_FS_STORE;
 			Files.delete(Paths.get(directory, filename));
 		} catch (IOException ex) {
