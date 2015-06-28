@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import se.customervalue.cvs.abstraction.dataaccess.*;
+import se.customervalue.cvs.abstraction.externalservice.AccSys.AccSysService;
+import se.customervalue.cvs.abstraction.externalservice.AccSys.representation.AccSysResponseRepresentation;
 import se.customervalue.cvs.api.exception.*;
 import se.customervalue.cvs.api.representation.APIResponseRepresentation;
 import se.customervalue.cvs.api.representation.domain.EmployeeRepresentation;
@@ -48,6 +50,9 @@ public class OrderServiceImpl implements OrderService {
 
 	@Autowired
 	private OwnedProductRepository ownedProductRepository;
+
+	@Autowired
+	private AccSysService accSysService;
 
 	@Override @Transactional
 	public APIResponseRepresentation placeOrder(OrderHeaderRepresentation order, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, ProductNotFoundException, UnpaidInvoiceQuotaReached {
@@ -202,7 +207,22 @@ public class OrderServiceImpl implements OrderService {
 		refundOrder.getInvoice().setStatus(InvoiceStatus.REFUND);
 		orderHeaderRepository.save(refundOrder);
 
+		AccSysResponseRepresentation accSysResponse = accSysService.logPayment(refundOrder.getInvoice().getInvoiceNumber(), Float.toString(calculateOrderTotal(refundOrder)));
+		// Here we can retry if there was an error logging the refund. For example, put it in a "retry" queue.
+
 		return new APIResponseRepresentation("016", "The order has been successfully refund!");
+	}
+
+	private float calculateOrderTotal(OrderHeader order) {
+		float total = 0.00f;
+
+		for (OrderItem orderItem : order.getOrderItems()) {
+			total += orderItem.getQuantity() * orderItem.getUnitPrice();
+		}
+
+		total += (total * order.getInvoice().getVAT()/100);
+
+		return total * (-1.0f);
 	}
 
 	private OwnedProduct findOwnedProductByName(Company owner, String name) {

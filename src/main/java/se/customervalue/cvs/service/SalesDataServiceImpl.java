@@ -142,7 +142,7 @@ public class SalesDataServiceImpl implements SalesDataService {
 		return new APIResponseRepresentation("018", "File uploaded successfully!");
 	}
 
-	@Override
+	@Override @Transactional
 	public APIResponseRepresentation deleteSalesData(int salesDataId, EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess, SalesDataDeleteException {
 		Role adminRole = roleRepository.findByLabel("isAdmin");
 		Employee currentEmployee = employeeRepository.findByEmail(loggedInEmployee.getEmail());

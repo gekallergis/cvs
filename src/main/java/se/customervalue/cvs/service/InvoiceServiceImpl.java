@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import se.customervalue.cvs.abstraction.dataaccess.*;
+import se.customervalue.cvs.abstraction.externalservice.AccSys.AccSysService;
+import se.customervalue.cvs.abstraction.externalservice.AccSys.representation.AccSysResponseRepresentation;
 import se.customervalue.cvs.api.exception.InvoiceNotFoundException;
 import se.customervalue.cvs.api.exception.UnauthorizedResourceAccess;
 import se.customervalue.cvs.api.representation.APIResponseRepresentation;
@@ -34,6 +36,9 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 	@Autowired
 	private OrderHeaderRepository orderHeaderRepository;
+
+	@Autowired
+	private AccSysService accSysService;
 
 	@Override @Transactional
 	public List<InvoiceRepresentation> getInvoices(EmployeeRepresentation loggedInEmployee) throws UnauthorizedResourceAccess {
@@ -134,6 +139,21 @@ public class InvoiceServiceImpl implements InvoiceService {
 		requestedInvoice.setStatus(InvoiceStatus.PAID);
 		invoiceRepository.save(requestedInvoice);
 
+		AccSysResponseRepresentation accSysResponse = accSysService.logPayment(requestedInvoice.getInvoiceNumber(), Float.toString(calculateInvoiceTotal(requestedInvoice)));
+		// Here we can retry if there was an error logging the payment. For example, put it in a "retry" queue.
+
 		return new APIResponseRepresentation("017", "The invoice status has been set to paid!");
+	}
+
+	private float calculateInvoiceTotal(Invoice invoice) {
+		float total = 0.00f;
+
+		for (OrderItem orderItem : invoice.getOrder().getOrderItems()) {
+			total += orderItem.getQuantity() * orderItem.getUnitPrice();
+		}
+
+		total += (total * invoice.getVAT()/100);
+
+		return total;
 	}
 }
