@@ -1,2 +1,2 @@
 # cvs
-The CVS back end system. KTH - Royal Institute of Technology master thesis project.
+The CVS back end system designed and developed for my master thesis project at KTH Royal Institute of Technology, Stockholm, Swden.
