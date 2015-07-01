@@ -1,2 +1,2 @@
 # cvs
-The Customer Value Sweden AB back end system.
+The CVS back end system. KTH Royal Institut of Technology master thesis project.
