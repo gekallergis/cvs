@@ -9,6 +9,7 @@ public final class CVSConfig  {
 
 	// Service endpoint
 	public static final String SERVICE_ENDPOINT = "https://localhost/#/";
+	// public static final String SERVICE_ENDPOINT = "https://192.168.0.5/#/";
 
 	// Activation key expiration time in minutes.
 	public static final long ACTIVATION_KEY_LIFETIME_MINUTES = 120;
@@ -21,12 +22,15 @@ public final class CVSConfig  {
 
 	// Default sales data filesystem storage
 	public static final String SALES_DATA_FS_STORE = "c:/cvs/salesData";
+	// public static final String SALES_DATA_FS_STORE = "/home/gkallergis/cvs/salesData";
 
 	// Default reports filesystem storage
 	public static final String REPORTS_FS_STORE = "c:/cvs/reports";
+	// public static final String REPORTS_FS_STORE = "/home/gkallergis/cvs/reports";
 
 	// Default temporary filesystem storage
 	public static final String TEMP_FS_STORE = "c:/cvs/temp";
+	// public static final String TEMP_FS_STORE = "/home/gkallergis/cvs/temp";
 
 	public static final String[] months = {"","January","February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 

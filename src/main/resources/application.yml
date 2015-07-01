@@ -19,11 +19,8 @@ spring.redis:
 # MySQL Database Configuration
 spring.datasource:
     # CVS DB
-    #url: jdbc:mysql://localhost:3306/cvs
-    #username: cvs
-    #password: cvs
-    # Test DB
     url: jdbc:mysql://localhost:3306/cvs
+    # url: jdbc:mysql://192.168.0.5:3306/cvs
     username: cvs
     password: cvs
     driverClassName: com.mysql.jdbc.Driver
@@ -42,13 +39,14 @@ spring.jpa:
 #    basic.enabled: true
 #    user:
 #        name: nginx
-#        password: nginxtsopou
+#        password: nginx
 
 # Data Upload Size
 multipart:
     maxFileSize: 512Mb
     maxRequestSize: 515Mb
     location: "c:/cvs/temp"
+    # location: "/home/gkallergis/cvs/temp"
     fileSizeThreshold: 16Mb
 
 # Logging Configuration
