@@ -607,8 +607,8 @@ public class Application extends WebMvcConfigurerAdapter implements CommandLineR
 		orderItem17.setOrder(order12);
 		order12.getOrderItems().add(orderItem17);
 
-		Product product1 = new Product("NewBiz Report", "Analyze your sales data!Generate your reports online!Blah blah blah!Lalalalala!Blah blah blah!Lalalalala!Blah blah blah!", false, 5000.0f);
-		Product product2 = new Product("Predictive Report", "Predict the future!Generate your reports online!Blah blah blah!Lalalalala!Blah blah blah!Lalalalala!Blah blah blah!", true, 50000.0f);
+		Product product1 = new Product("NewBiz Report", "Analyze your sales data!Generate your reports online!Blah blah blah!Lalalalala!Blah blah blah!Lalalalala!Blah blah blah!", false, ProductType.NEWBIZ, 5000.0f);
+		Product product2 = new Product("Predictive Report", "Predict the future!Generate your reports online!Blah blah blah!Lalalalala!Blah blah blah!Lalalalala!Blah blah blah!", true, ProductType.PREDICTIVE, 50000.0f);
 		productRepository.save(product1);
 		productRepository.save(product2);
 

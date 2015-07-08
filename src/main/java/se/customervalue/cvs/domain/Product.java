@@ -18,15 +18,19 @@ public class Product {
 
 	private float unitPrice;
 
+	@Enumerated(EnumType.STRING)
+	private ProductType type;
+
 	@OneToMany(mappedBy="product")
 	private List<OwnedProduct> purchases = new ArrayList<OwnedProduct>();
 
 	public Product() {}
 
-	public Product(String name, String info, boolean isPopular, float unitPrice) {
+	public Product(String name, String info, boolean isPopular, ProductType type, float unitPrice) {
 		this.name = name;
 		this.info = info;
 		this.isPopular = isPopular;
+		this.type = type;
 		this.unitPrice = unitPrice;
 	}
 
@@ -69,6 +73,10 @@ public class Product {
 	public void setIsPopular(boolean isPopular) {
 		this.isPopular = isPopular;
 	}
+
+	public ProductType getType() { return type; }
+
+	public void setType(ProductType type) { this.type = type; }
 
 	public float getUnitPrice() {
 		return unitPrice;
