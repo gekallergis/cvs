@@ -13,6 +13,8 @@
 	</parent>
 
 	<properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
 		<spring-data-releasetrain.version>Fowler-RELEASE</spring-data-releasetrain.version>
 	</properties>
 

@@ -32,7 +32,7 @@ public class SalesData {
 	@JoinColumn(name="uploadedBy", foreignKey = @ForeignKey(name = "FK_SaleDataUploadedBy"))
 	private Employee uploader;
 
-	@OneToMany(mappedBy="salesDataBatch")
+	@OneToMany(mappedBy="salesDataBatch", fetch = FetchType.LAZY)
 	private List<Transaction> transactions = new ArrayList<Transaction>();
 
 	public SalesData() {}

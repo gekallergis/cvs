@@ -58,5 +58,6 @@ logging:
             web: INFO
             boot: INFO
             core: INFO
+            data: INFO
         org.hibernate:
             type: INFO

@@ -15,7 +15,7 @@ public class Transaction {
 
 	private float amount;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="salesDataBatch", foreignKey = @ForeignKey(name = "FK_TransactionSalesDataBatch"))
 	private SalesData salesDataBatch;
 
