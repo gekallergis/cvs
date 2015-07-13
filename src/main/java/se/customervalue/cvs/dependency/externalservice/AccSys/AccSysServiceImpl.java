@@ -16,12 +16,6 @@ public class AccSysServiceImpl implements AccSysService {
 
 	@Override @Async
 	public AccSysResponseRepresentation logPayment(String invoiceNumber, String amount) {
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			log.error("THREAD ERROR!!");
-		}
-
 		RestTemplate restTemplate = new RestTemplate();
 		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
 

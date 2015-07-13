@@ -2,8 +2,8 @@ package se.customervalue.cvs.domain;
 
 public enum ProductType
 {
-	NEWBIZ("NewBiz"),
-	PREDICTIVE("PredictiveReport");
+	NEWBIZ("NEWBIZ"),
+	PREDICTIVE("PREDICTIVE");
 
 	private String descr;
 

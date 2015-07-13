@@ -11,6 +11,10 @@ public final class CVSConfig  {
 	public static final String SERVICE_ENDPOINT = "https://localhost/#/";
 	// public static final String SERVICE_ENDPOINT = "https://192.168.0.5/#/";
 
+	// Genny endpoint
+	public static final String GENNY_SERVICE_ENDPOINT = "http://localhost:9000/report";
+	// public static final String GENNY_SERVICE_ENDPOINT = "http://192.168.0.5:9000/report";
+
 	// Activation key expiration time in minutes.
 	public static final long ACTIVATION_KEY_LIFETIME_MINUTES = 120;
 

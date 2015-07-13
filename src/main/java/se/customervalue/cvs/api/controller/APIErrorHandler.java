@@ -173,4 +173,22 @@ public class APIErrorHandler {
 	public APIResponseRepresentation SalesDataDeleteExceptionHandler(SalesDataDeleteException ex) {
 		return new APIResponseRepresentation("125", "There was an error removing the sales data file! Please contact customer support!");
 	}
+
+	@ExceptionHandler(UnauthorizedReportGeneration.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation unauthorizedReportGenerationHandler(UnauthorizedReportGeneration ex) {
+		return new APIResponseRepresentation("126", "Ops! You are not allowed to generate the requested report!");
+	}
+
+	@ExceptionHandler(UnavailableOwnedProductsException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation unavailableOwnedProductsExceptionHandler(UnavailableOwnedProductsException ex) {
+		return new APIResponseRepresentation("127", "There are not enough purchased products to generate the requested report!");
+	}
+
+	@ExceptionHandler(ReportGenerationException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public APIResponseRepresentation reportGenerationExceptionHandler(ReportGenerationException ex) {
+		return new APIResponseRepresentation("128", "There was en error generating the report! Please try again later! If the problem persists, contact customer support!");
+	}
 }
