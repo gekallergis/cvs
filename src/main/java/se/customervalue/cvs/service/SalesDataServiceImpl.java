@@ -40,6 +40,9 @@ public class SalesDataServiceImpl implements SalesDataService {
 	@Autowired
 	private CompanyRepository companyRepository;
 
+	@Autowired
+	private SalesDataValidityService salesDataValidityService;
+
 	@Override @Transactional
 	public List<SalesDataRepresentation> getSalesData(EmployeeRepresentation loggedInEmployee) {
 		List<SalesData> salesData = new ArrayList<SalesData>();
@@ -132,12 +135,12 @@ public class SalesDataServiceImpl implements SalesDataService {
 			if (companySalesDataChecked.size() == 1) {
 				companySalesDataChecked.get(0).setStatus(SalesDataStatus.REPLACED);
 			}
+
+			salesDataValidityService.startValidation(new File(filepath), newSalesData);
 		} catch (IOException ex) {
 			salesDataRepository.delete(newSalesData);
 			throw new SalesDataUploadException();
-		}// finally {
-			// Initiate file checking here!
-		//}
+		}
 
 		return new APIResponseRepresentation("018", "File uploaded successfully!");
 	}

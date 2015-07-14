@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -676,255 +677,255 @@ public class Application extends WebMvcConfigurerAdapter implements CommandLineR
 		ownedProductRepository.save(ownedProduct7);
 		ownedProductRepository.save(ownedProduct8);
 
-		SalesData salesData1 = new SalesData("March 2014", SalesDataStatus.CHECKED, new Date(), "");
-		SalesData salesData2 = new SalesData("February 2014", SalesDataStatus.ERROR, new Date(), "");
-		SalesData salesData3 = new SalesData("July 2014", SalesDataStatus.PROCESSING, new Date(), "");
-		SalesData salesData4 = new SalesData("January 2015", SalesDataStatus.REPLACED, new Date(), "");
-		salesDataRepository.save(salesData1);
-		salesDataRepository.save(salesData2);
-		salesDataRepository.save(salesData3);
-		salesDataRepository.save(salesData4);
-
-		salesData1.setUploader(employee9);
-		employee9.getSalesDataUploads().add(salesData1);
-		salesData1.setCompany(companya1);
-		companya1.getSalesData().add(salesData1);
-
-		salesData2.setUploader(employee7);
-		employee7.getSalesDataUploads().add(salesData2);
-		salesData2.setCompany(companya1);
-		companya1.getSalesData().add(salesData2);
-
-		salesData3.setUploader(employee8);
-		employee8.getSalesDataUploads().add(salesData3);
-		salesData3.setCompany(companya2);
-		companya2.getSalesData().add(salesData3);
-
-		salesData4.setUploader(employee10);
-		employee10.getSalesDataUploads().add(salesData4);
-		salesData4.setCompany(companyb);
-		companyb.getSalesData().add(salesData4);
-
-		Transaction transaction1 = new Transaction("5612", new Date(), 241.92f);
-		Transaction transaction2 = new Transaction("1751", new Date(), 95.36f);
-		Transaction transaction3 = new Transaction("6382", new Date(), 241.92f);
-		Transaction transaction4 = new Transaction("9514", new Date(), 313.6f);
-		Transaction transaction5 = new Transaction("5615", new Date(), 241.92f);
-		Transaction transaction6 = new Transaction("3217", new Date(), 241.92f);
-		Transaction transaction7 = new Transaction("3741", new Date(), 185.92f);
-		Transaction transaction8 = new Transaction("9637", new Date(), 241.92f);
-		Transaction transaction9 = new Transaction("3171", new Date(), -39.2f);
-		Transaction transaction10 = new Transaction("3467", new Date(), 185.92f);
-		Transaction transaction11 = new Transaction("1751", new Date(), 241.92f);
-		Transaction transaction12 = new Transaction("3741", new Date(), 241.92f);
-		Transaction transaction13 = new Transaction("6382", new Date(), 241.92f);
-		Transaction transaction14 = new Transaction("5612", new Date(), 241.92f);
-		Transaction transaction15 = new Transaction("5612", new Date(), 241.92f);
-		Transaction transaction16 = new Transaction("1751", new Date(), 241.92f);
-		Transaction transaction17 = new Transaction("6382", new Date(), 241.92f);
-		Transaction transaction18 = new Transaction("3741", new Date(), 241.92f);
-		Transaction transaction19 = new Transaction("6382", new Date(), 241.92f);
-		Transaction transaction20 = new Transaction("3741", new Date(), 241.92f);
-		transactionRepository.save(transaction1);
-		transactionRepository.save(transaction2);
-		transactionRepository.save(transaction3);
-		transactionRepository.save(transaction4);
-		transactionRepository.save(transaction5);
-		transactionRepository.save(transaction6);
-		transactionRepository.save(transaction7);
-		transactionRepository.save(transaction8);
-		transactionRepository.save(transaction9);
-		transactionRepository.save(transaction10);
-		transactionRepository.save(transaction11);
-		transactionRepository.save(transaction12);
-		transactionRepository.save(transaction13);
-		transactionRepository.save(transaction14);
-		transactionRepository.save(transaction15);
-		transactionRepository.save(transaction16);
-		transactionRepository.save(transaction17);
-		transactionRepository.save(transaction18);
-		transactionRepository.save(transaction19);
-		transactionRepository.save(transaction20);
-
-		transaction1.setSalesDataBatch(salesData1);
-		salesData1.getTransactions().add(transaction1);
-		transaction1.setCountry(country1);
-		country1.getTransactions().add(transaction1);
-		transaction1.setCurrency(currency1);
-		currency1.getTransactions().add(transaction1);
-
-		transaction2.setSalesDataBatch(salesData1);
-		salesData1.getTransactions().add(transaction2);
-		transaction2.setCountry(country1);
-		country1.getTransactions().add(transaction2);
-		transaction2.setCurrency(currency1);
-		currency1.getTransactions().add(transaction2);
-
-		transaction3.setSalesDataBatch(salesData1);
-		salesData1.getTransactions().add(transaction3);
-		transaction3.setCountry(country1);
-		country1.getTransactions().add(transaction3);
-		transaction3.setCurrency(currency1);
-		currency1.getTransactions().add(transaction3);
-
-		transaction4.setSalesDataBatch(salesData1);
-		salesData1.getTransactions().add(transaction4);
-		transaction4.setCountry(country1);
-		country1.getTransactions().add(transaction4);
-		transaction4.setCurrency(currency1);
-		currency1.getTransactions().add(transaction4);
-
-		transaction5.setSalesDataBatch(salesData1);
-		salesData1.getTransactions().add(transaction5);
-		transaction5.setCountry(country1);
-		country1.getTransactions().add(transaction5);
-		transaction5.setCurrency(currency1);
-		currency1.getTransactions().add(transaction5);
-
-		transaction6.setSalesDataBatch(salesData2);
-		salesData2.getTransactions().add(transaction6);
-		transaction6.setCountry(country1);
-		country1.getTransactions().add(transaction6);
-		transaction6.setCurrency(currency1);
-		currency1.getTransactions().add(transaction6);
-
-		transaction7.setSalesDataBatch(salesData2);
-		salesData2.getTransactions().add(transaction7);
-		transaction7.setCountry(country1);
-		country1.getTransactions().add(transaction7);
-		transaction7.setCurrency(currency1);
-		currency1.getTransactions().add(transaction7);
-
-		transaction8.setSalesDataBatch(salesData2);
-		salesData2.getTransactions().add(transaction8);
-		transaction8.setCountry(country1);
-		country1.getTransactions().add(transaction8);
-		transaction8.setCurrency(currency1);
-		currency1.getTransactions().add(transaction8);
-
-		transaction9.setSalesDataBatch(salesData2);
-		salesData2.getTransactions().add(transaction9);
-		transaction9.setCountry(country1);
-		country1.getTransactions().add(transaction9);
-		transaction9.setCurrency(currency1);
-		currency1.getTransactions().add(transaction9);
-
-		transaction10.setSalesDataBatch(salesData2);
-		salesData2.getTransactions().add(transaction10);
-		transaction10.setCountry(country1);
-		country1.getTransactions().add(transaction10);
-		transaction10.setCurrency(currency1);
-		currency1.getTransactions().add(transaction10);
-
-		transaction11.setSalesDataBatch(salesData3);
-		salesData3.getTransactions().add(transaction11);
-		transaction11.setCountry(country1);
-		country1.getTransactions().add(transaction11);
-		transaction11.setCurrency(currency1);
-		currency1.getTransactions().add(transaction11);
-
-		transaction12.setSalesDataBatch(salesData3);
-		salesData3.getTransactions().add(transaction12);
-		transaction12.setCountry(country1);
-		country1.getTransactions().add(transaction12);
-		transaction12.setCurrency(currency1);
-		currency1.getTransactions().add(transaction12);
-
-		transaction13.setSalesDataBatch(salesData3);
-		salesData3.getTransactions().add(transaction13);
-		transaction13.setCountry(country1);
-		country1.getTransactions().add(transaction13);
-		transaction13.setCurrency(currency1);
-		currency1.getTransactions().add(transaction13);
-
-		transaction14.setSalesDataBatch(salesData3);
-		salesData3.getTransactions().add(transaction14);
-		transaction14.setCountry(country1);
-		country1.getTransactions().add(transaction14);
-		transaction14.setCurrency(currency1);
-		currency1.getTransactions().add(transaction14);
-
-		transaction15.setSalesDataBatch(salesData3);
-		salesData3.getTransactions().add(transaction15);
-		transaction15.setCountry(country1);
-		country1.getTransactions().add(transaction15);
-		transaction15.setCurrency(currency1);
-		currency1.getTransactions().add(transaction15);
-
-		transaction16.setSalesDataBatch(salesData4);
-		salesData4.getTransactions().add(transaction16);
-		transaction16.setCountry(country1);
-		country1.getTransactions().add(transaction16);
-		transaction16.setCurrency(currency1);
-		currency1.getTransactions().add(transaction16);
-
-		transaction17.setSalesDataBatch(salesData4);
-		salesData4.getTransactions().add(transaction17);
-		transaction17.setCountry(country1);
-		country1.getTransactions().add(transaction17);
-		transaction17.setCurrency(currency1);
-		currency1.getTransactions().add(transaction17);
-
-		transaction18.setSalesDataBatch(salesData4);
-		salesData4.getTransactions().add(transaction18);
-		transaction18.setCountry(country1);
-		country1.getTransactions().add(transaction18);
-		transaction18.setCurrency(currency1);
-		currency1.getTransactions().add(transaction18);
-
-		transaction19.setSalesDataBatch(salesData4);
-		salesData4.getTransactions().add(transaction19);
-		transaction19.setCountry(country1);
-		country1.getTransactions().add(transaction19);
-		transaction19.setCurrency(currency1);
-		currency1.getTransactions().add(transaction19);
-
-		transaction20.setSalesDataBatch(salesData4);
-		salesData4.getTransactions().add(transaction20);
-		transaction20.setCountry(country1);
-		country1.getTransactions().add(transaction20);
-		transaction20.setCurrency(currency1);
-		currency1.getTransactions().add(transaction20);
-
-		Report report1 = new Report(new Date(), "", ReportStatus.GENERATING);
-		Report report2 = new Report(new Date(), "", ReportStatus.READY);
-		Report report3 = new Report(new Date(), "", ReportStatus.ERROR);
-		Report report4 = new Report(new Date(), "", ReportStatus.READY);
-		reportRepository.save(report1);
-		reportRepository.save(report2);
-		reportRepository.save(report3);
-		reportRepository.save(report4);
-
-		report1.setReporter(employee9);
-		employee9.getGeneratedReports().add(report1);
-		report1.setCompany(companya1);
-		companya1.getReports().add(report1);
-		report1.setProduct(product1);
-		report1.setSalesData(salesData1);
-		salesData1.getReports().add(report1);
-
-		report2.setReporter(employee9);
-		employee9.getGeneratedReports().add(report2);
-		report2.setCompany(companya1);
-		companya1.getReports().add(report2);
-		report2.setProduct(product2);
-		report2.setSalesData(salesData2);
-		salesData2.getReports().add(report2);
-
-		report3.setReporter(employee9);
-		employee9.getGeneratedReports().add(report3);
-		report3.setCompany(companya2);
-		companya2.getReports().add(report3);
-		report3.setProduct(product2);
-		report3.setSalesData(salesData3);
-		salesData3.getReports().add(report3);
-
-		report4.setReporter(employee9);
-		employee9.getGeneratedReports().add(report4);
-		report4.setCompany(companyb);
-		companyb.getReports().add(report4);
-		report4.setProduct(product1);
-		report4.setSalesData(salesData4);
-		salesData4.getReports().add(report4);
+//		SalesData salesData1 = new SalesData("March 2014", SalesDataStatus.CHECKED, new Date(), "");
+//		SalesData salesData2 = new SalesData("February 2014", SalesDataStatus.ERROR, new Date(), "");
+//		SalesData salesData3 = new SalesData("July 2014", SalesDataStatus.PROCESSING, new Date(), "");
+//		SalesData salesData4 = new SalesData("January 2015", SalesDataStatus.REPLACED, new Date(), "");
+//		salesDataRepository.save(salesData1);
+//		salesDataRepository.save(salesData2);
+//		salesDataRepository.save(salesData3);
+//		salesDataRepository.save(salesData4);
+//
+//		salesData1.setUploader(employee9);
+//		employee9.getSalesDataUploads().add(salesData1);
+//		salesData1.setCompany(companya1);
+//		companya1.getSalesData().add(salesData1);
+//
+//		salesData2.setUploader(employee7);
+//		employee7.getSalesDataUploads().add(salesData2);
+//		salesData2.setCompany(companya1);
+//		companya1.getSalesData().add(salesData2);
+//
+//		salesData3.setUploader(employee8);
+//		employee8.getSalesDataUploads().add(salesData3);
+//		salesData3.setCompany(companya2);
+//		companya2.getSalesData().add(salesData3);
+//
+//		salesData4.setUploader(employee10);
+//		employee10.getSalesDataUploads().add(salesData4);
+//		salesData4.setCompany(companyb);
+//		companyb.getSalesData().add(salesData4);
+//
+//		Transaction transaction1 = new Transaction("5612", new Date(), 241.92f);
+//		Transaction transaction2 = new Transaction("1751", new Date(), 95.36f);
+//		Transaction transaction3 = new Transaction("6382", new Date(), 241.92f);
+//		Transaction transaction4 = new Transaction("9514", new Date(), 313.6f);
+//		Transaction transaction5 = new Transaction("5615", new Date(), 241.92f);
+//		Transaction transaction6 = new Transaction("3217", new Date(), 241.92f);
+//		Transaction transaction7 = new Transaction("3741", new Date(), 185.92f);
+//		Transaction transaction8 = new Transaction("9637", new Date(), 241.92f);
+//		Transaction transaction9 = new Transaction("3171", new Date(), -39.2f);
+//		Transaction transaction10 = new Transaction("3467", new Date(), 185.92f);
+//		Transaction transaction11 = new Transaction("1751", new Date(), 241.92f);
+//		Transaction transaction12 = new Transaction("3741", new Date(), 241.92f);
+//		Transaction transaction13 = new Transaction("6382", new Date(), 241.92f);
+//		Transaction transaction14 = new Transaction("5612", new Date(), 241.92f);
+//		Transaction transaction15 = new Transaction("5612", new Date(), 241.92f);
+//		Transaction transaction16 = new Transaction("1751", new Date(), 241.92f);
+//		Transaction transaction17 = new Transaction("6382", new Date(), 241.92f);
+//		Transaction transaction18 = new Transaction("3741", new Date(), 241.92f);
+//		Transaction transaction19 = new Transaction("6382", new Date(), 241.92f);
+//		Transaction transaction20 = new Transaction("3741", new Date(), 241.92f);
+//		transactionRepository.save(transaction1);
+//		transactionRepository.save(transaction2);
+//		transactionRepository.save(transaction3);
+//		transactionRepository.save(transaction4);
+//		transactionRepository.save(transaction5);
+//		transactionRepository.save(transaction6);
+//		transactionRepository.save(transaction7);
+//		transactionRepository.save(transaction8);
+//		transactionRepository.save(transaction9);
+//		transactionRepository.save(transaction10);
+//		transactionRepository.save(transaction11);
+//		transactionRepository.save(transaction12);
+//		transactionRepository.save(transaction13);
+//		transactionRepository.save(transaction14);
+//		transactionRepository.save(transaction15);
+//		transactionRepository.save(transaction16);
+//		transactionRepository.save(transaction17);
+//		transactionRepository.save(transaction18);
+//		transactionRepository.save(transaction19);
+//		transactionRepository.save(transaction20);
+//
+//		transaction1.setSalesDataBatch(salesData1);
+//		salesData1.getTransactions().add(transaction1);
+//		transaction1.setCountry(country1);
+//		country1.getTransactions().add(transaction1);
+//		transaction1.setCurrency(currency1);
+//		currency1.getTransactions().add(transaction1);
+//
+//		transaction2.setSalesDataBatch(salesData1);
+//		salesData1.getTransactions().add(transaction2);
+//		transaction2.setCountry(country1);
+//		country1.getTransactions().add(transaction2);
+//		transaction2.setCurrency(currency1);
+//		currency1.getTransactions().add(transaction2);
+//
+//		transaction3.setSalesDataBatch(salesData1);
+//		salesData1.getTransactions().add(transaction3);
+//		transaction3.setCountry(country1);
+//		country1.getTransactions().add(transaction3);
+//		transaction3.setCurrency(currency1);
+//		currency1.getTransactions().add(transaction3);
+//
+//		transaction4.setSalesDataBatch(salesData1);
+//		salesData1.getTransactions().add(transaction4);
+//		transaction4.setCountry(country1);
+//		country1.getTransactions().add(transaction4);
+//		transaction4.setCurrency(currency1);
+//		currency1.getTransactions().add(transaction4);
+//
+//		transaction5.setSalesDataBatch(salesData1);
+//		salesData1.getTransactions().add(transaction5);
+//		transaction5.setCountry(country1);
+//		country1.getTransactions().add(transaction5);
+//		transaction5.setCurrency(currency1);
+//		currency1.getTransactions().add(transaction5);
+//
+//		transaction6.setSalesDataBatch(salesData2);
+//		salesData2.getTransactions().add(transaction6);
+//		transaction6.setCountry(country1);
+//		country1.getTransactions().add(transaction6);
+//		transaction6.setCurrency(currency1);
+//		currency1.getTransactions().add(transaction6);
+//
+//		transaction7.setSalesDataBatch(salesData2);
+//		salesData2.getTransactions().add(transaction7);
+//		transaction7.setCountry(country1);
+//		country1.getTransactions().add(transaction7);
+//		transaction7.setCurrency(currency1);
+//		currency1.getTransactions().add(transaction7);
+//
+//		transaction8.setSalesDataBatch(salesData2);
+//		salesData2.getTransactions().add(transaction8);
+//		transaction8.setCountry(country1);
+//		country1.getTransactions().add(transaction8);
+//		transaction8.setCurrency(currency1);
+//		currency1.getTransactions().add(transaction8);
+//
+//		transaction9.setSalesDataBatch(salesData2);
+//		salesData2.getTransactions().add(transaction9);
+//		transaction9.setCountry(country1);
+//		country1.getTransactions().add(transaction9);
+//		transaction9.setCurrency(currency1);
+//		currency1.getTransactions().add(transaction9);
+//
+//		transaction10.setSalesDataBatch(salesData2);
+//		salesData2.getTransactions().add(transaction10);
+//		transaction10.setCountry(country1);
+//		country1.getTransactions().add(transaction10);
+//		transaction10.setCurrency(currency1);
+//		currency1.getTransactions().add(transaction10);
+//
+//		transaction11.setSalesDataBatch(salesData3);
+//		salesData3.getTransactions().add(transaction11);
+//		transaction11.setCountry(country1);
+//		country1.getTransactions().add(transaction11);
+//		transaction11.setCurrency(currency1);
+//		currency1.getTransactions().add(transaction11);
+//
+//		transaction12.setSalesDataBatch(salesData3);
+//		salesData3.getTransactions().add(transaction12);
+//		transaction12.setCountry(country1);
+//		country1.getTransactions().add(transaction12);
+//		transaction12.setCurrency(currency1);
+//		currency1.getTransactions().add(transaction12);
+//
+//		transaction13.setSalesDataBatch(salesData3);
+//		salesData3.getTransactions().add(transaction13);
+//		transaction13.setCountry(country1);
+//		country1.getTransactions().add(transaction13);
+//		transaction13.setCurrency(currency1);
+//		currency1.getTransactions().add(transaction13);
+//
+//		transaction14.setSalesDataBatch(salesData3);
+//		salesData3.getTransactions().add(transaction14);
+//		transaction14.setCountry(country1);
+//		country1.getTransactions().add(transaction14);
+//		transaction14.setCurrency(currency1);
+//		currency1.getTransactions().add(transaction14);
+//
+//		transaction15.setSalesDataBatch(salesData3);
+//		salesData3.getTransactions().add(transaction15);
+//		transaction15.setCountry(country1);
+//		country1.getTransactions().add(transaction15);
+//		transaction15.setCurrency(currency1);
+//		currency1.getTransactions().add(transaction15);
+//
+//		transaction16.setSalesDataBatch(salesData4);
+//		salesData4.getTransactions().add(transaction16);
+//		transaction16.setCountry(country1);
+//		country1.getTransactions().add(transaction16);
+//		transaction16.setCurrency(currency1);
+//		currency1.getTransactions().add(transaction16);
+//
+//		transaction17.setSalesDataBatch(salesData4);
+//		salesData4.getTransactions().add(transaction17);
+//		transaction17.setCountry(country1);
+//		country1.getTransactions().add(transaction17);
+//		transaction17.setCurrency(currency1);
+//		currency1.getTransactions().add(transaction17);
+//
+//		transaction18.setSalesDataBatch(salesData4);
+//		salesData4.getTransactions().add(transaction18);
+//		transaction18.setCountry(country1);
+//		country1.getTransactions().add(transaction18);
+//		transaction18.setCurrency(currency1);
+//		currency1.getTransactions().add(transaction18);
+//
+//		transaction19.setSalesDataBatch(salesData4);
+//		salesData4.getTransactions().add(transaction19);
+//		transaction19.setCountry(country1);
+//		country1.getTransactions().add(transaction19);
+//		transaction19.setCurrency(currency1);
+//		currency1.getTransactions().add(transaction19);
+//
+//		transaction20.setSalesDataBatch(salesData4);
+//		salesData4.getTransactions().add(transaction20);
+//		transaction20.setCountry(country1);
+//		country1.getTransactions().add(transaction20);
+//		transaction20.setCurrency(currency1);
+//		currency1.getTransactions().add(transaction20);
+//
+//		Report report1 = new Report(new Date(), "", ReportStatus.GENERATING);
+//		Report report2 = new Report(new Date(), "", ReportStatus.READY);
+//		Report report3 = new Report(new Date(), "", ReportStatus.ERROR);
+//		Report report4 = new Report(new Date(), "", ReportStatus.READY);
+//		reportRepository.save(report1);
+//		reportRepository.save(report2);
+//		reportRepository.save(report3);
+//		reportRepository.save(report4);
+//
+//		report1.setReporter(employee9);
+//		employee9.getGeneratedReports().add(report1);
+//		report1.setCompany(companya1);
+//		companya1.getReports().add(report1);
+//		report1.setProduct(product1);
+//		report1.setSalesData(salesData1);
+//		salesData1.getReports().add(report1);
+//
+//		report2.setReporter(employee9);
+//		employee9.getGeneratedReports().add(report2);
+//		report2.setCompany(companya1);
+//		companya1.getReports().add(report2);
+//		report2.setProduct(product2);
+//		report2.setSalesData(salesData2);
+//		salesData2.getReports().add(report2);
+//
+//		report3.setReporter(employee9);
+//		employee9.getGeneratedReports().add(report3);
+//		report3.setCompany(companya2);
+//		companya2.getReports().add(report3);
+//		report3.setProduct(product2);
+//		report3.setSalesData(salesData3);
+//		salesData3.getReports().add(report3);
+//
+//		report4.setReporter(employee9);
+//		employee9.getGeneratedReports().add(report4);
+//		report4.setCompany(companyb);
+//		companyb.getReports().add(report4);
+//		report4.setProduct(product1);
+//		report4.setSalesData(salesData4);
+//		salesData4.getReports().add(report4);
 	}
 }
