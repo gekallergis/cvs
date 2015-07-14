@@ -92,8 +92,12 @@ public class SalesDataValidityServiceImpl implements SalesDataValidityService {
 			log.debug("[Sales Data Validation Service] " + file.getName() + " validated in " + Duration.between(start, end).getNano() / 1000000 + "ms");
 		} catch (IOException ex) {
 			log.error("[Sales Data Validation Service] Something went wrong while validating " + file.getAbsolutePath());
+			salesData.setStatus(SalesDataStatus.ERROR);
+			salesDataRepository.save(salesData);
 		} catch (ParseException e) {
 			log.error("[Sales Data Validation Service] Error parsing date limits for " + file.getAbsolutePath());
+			salesData.setStatus(SalesDataStatus.ERROR);
+			salesDataRepository.save(salesData);
 		} catch (SalesDataValidationException e) {
 			log.error("[Sales Data Validation Service] Error parsing sales data file " + file.getAbsolutePath());
 			salesData.setStatus(SalesDataStatus.ERROR);
