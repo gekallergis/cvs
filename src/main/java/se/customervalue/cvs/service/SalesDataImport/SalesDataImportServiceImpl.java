@@ -3,7 +3,6 @@ package se.customervalue.cvs.service.SalesDataImport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import se.customervalue.cvs.abstraction.dataaccess.CountryRepository;
@@ -13,9 +12,6 @@ import se.customervalue.cvs.abstraction.dataaccess.TransactionRepository;
 import se.customervalue.cvs.common.CVSConfig;
 import se.customervalue.cvs.domain.*;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.transaction.Transactional;
 import java.io.BufferedReader;
 import java.io.File;
@@ -43,16 +39,11 @@ public class SalesDataImportServiceImpl implements SalesDataImportService {
 	@Autowired
 	private CurrencyRepository currencyRepository;
 
-	@PersistenceContext
-	private EntityManager entityManager;
-
-	@Value("${spring.jpa.hibernate.jdbc.batch-size}")
-	private int batchSize;
-
 	@Override @Async @Transactional
-	public void start(File file, SalesData salesData) {
+	public void start(File file, int salesDataId) {
+		SalesData salesData = salesDataRepository.findBySalesDataId(salesDataId);
 		if(isValid(file, salesData)) {
-			importTransactionsFast(file, salesData);
+			importTransactions(salesData);
 		} else {
 			log.error("[Sales Data Validation Service] Error validating sales data file " + file.getAbsolutePath());
 			salesData.setStatus(SalesDataStatus.ERROR);
@@ -112,6 +103,7 @@ public class SalesDataImportServiceImpl implements SalesDataImportService {
 			long duration = (endTime - startTime) / 1000000;
 			log.debug("[Sales Data Validation Service] " + file.getName() + " validated in " + duration + "ms");
 		} catch (IOException | ParseException ex) {
+			salesDataFileIsValid = false;
 			salesData.setStatus(SalesDataStatus.ERROR);
 			salesDataRepository.save(salesData);
 		}
@@ -119,87 +111,16 @@ public class SalesDataImportServiceImpl implements SalesDataImportService {
 		return salesDataFileIsValid;
 	}
 
-	private void importTransactions(File file, SalesData salesData) {
-		log.debug("[Sales Data Validation Service] Importing transactions for sales data batch ID " + salesData.getSalesDataId());
-		try {
-			long startTime = System.nanoTime();
-
-			int transactionCount = 0;
-			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-			try(BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
-				String line = bufferedReader.readLine();
-				while((line = bufferedReader.readLine()) != null) {
-					transactionCount++;
-					String[] transactionData = line.split("\t");
-					Transaction newTransaction = new Transaction(transactionData[0], dateFormat.parse(transactionData[2]), Float.parseFloat(transactionData[5]));
-					newTransaction.setSalesDataBatch(salesData);
-					salesData.getTransactions().add(newTransaction);
-
-					Country newTransactionCountry = countryRepository.findByIso31661a2(transactionData[1].substring(1, transactionData[1].length()-1));
-					Currency newTransactionCurrency = currencyRepository.findByIso4217(transactionData[4].substring(1, transactionData[4].length()-1));
-
-					newTransaction.setCountry(newTransactionCountry);
-					newTransactionCountry.getTransactions().add(newTransaction);
-					newTransaction.setCurrency(newTransactionCurrency);
-					newTransactionCurrency.getTransactions().add(newTransaction);
-
-					transactionRepository.save(newTransaction);
-					countryRepository.save(newTransactionCountry);
-					currencyRepository.save(newTransactionCurrency);
-
-					if (transactionCount % batchSize == 0) {
-						entityManager.flush();
-						entityManager.clear();
-					}
-				}
-			}
-
-			long endTime = System.nanoTime();
-			long duration = (endTime - startTime) / 1000000;
-			log.debug("[Sales Data Validation Service] " + file.getName() + " imported in " + duration + "ms");
-
-			salesData.setStatus(SalesDataStatus.CHECKED);
-			salesDataRepository.save(salesData);
-		} catch (IOException ex) {
-			log.error("[Sales Data Validation Service] Something went wrong while validating " + file.getAbsolutePath());
-			salesData.setStatus(SalesDataStatus.ERROR);
-			salesDataRepository.save(salesData);
-		} catch (ParseException e) {
-			log.error("[Sales Data Validation Service] Error parsing date limits for " + file.getAbsolutePath());
-			salesData.setStatus(SalesDataStatus.ERROR);
-			salesDataRepository.save(salesData);
-		}
-	}
-
-	private void importTransactionsFast(File file, SalesData salesData) {
+	private void importTransactions(SalesData salesData) {
 		log.debug("[Sales Data Validation Service] Importing transactions for sales data batch ID " + salesData.getSalesDataId());
 
 		long startTime = System.nanoTime();
-
-		String importQueryString = "SET FOREIGN_KEY_CHECKS = 0; SET UNIQUE_CHECKS = 0; SET SESSION tx_isolation='READ-UNCOMMITTED'; " +
-								 "LOAD DATA LOCAL INFILE \" ? \" INTO TABLE cvs.transaction " +
-								 "FIELDS TERMINATED BY '\\t' " +
-								 "OPTIONALLY ENCLOSED BY '\"' " +
-								 "LINES TERMINATED BY '\\r\\n' " +
-								 "IGNORE 1 LINES " +
-								 "(consumerId, @countryId, date, @dummy, @currencyId, amount) " +
-								 "SET country = (SELECT countryId FROM country WHERE iso31661a2 = TRIM(BOTH '\"' FROM @countryId)), " +
-									 "currency = (SELECT currencyId FROM currency WHERE iso4217 = TRIM(BOTH '\"' FROM @currencyId)), " +
-									 "salesDataBatch = ? ; " +
-								 "SET UNIQUE_CHECKS = 1; SET FOREIGN_KEY_CHECKS = 1; SET SESSION tx_isolation='REPEATABLE-READ'; ";
-
-		Query importQuery = entityManager.createNativeQuery(importQueryString);
-		Query finalImportQuery = importQuery.setParameter(1, salesData.getFilePath().replace("\\", "/")).setParameter(2, salesData.getSalesDataId());
-		int modifications = finalImportQuery.executeUpdate();
-
-		log.warn("[Sales Data Validation Service] Imported " + modifications + " records to the database!");
-
+		int modifications = salesDataRepository.importSalesDataBatch(salesData.getFilePath().replace("\\", "/"), salesData.getSalesDataId());
 		long endTime = System.nanoTime();
 		long duration = (endTime - startTime) / 1000000;
-		log.debug("[Sales Data Validation Service] " + file.getName() + " imported in " + duration + "ms");
+		log.debug("[Sales Data Validation Service] Imported " + modifications + " records to the database in " + duration + "ms");
 
 		salesData.setStatus(SalesDataStatus.CHECKED);
 		salesDataRepository.save(salesData);
-		entityManager.refresh(salesData);
 	}
 }

@@ -27,7 +27,7 @@ spring.datasource:
 
 spring.jpa:
     database: MYSQL
-    show-sql: true
+    show-sql: false
     hibernate.order-inserts: true
     hibernate.order-updates: true
     hibernate.jdbc.batch-size: 50
@@ -64,4 +64,4 @@ logging:
             data: INFO
         org.hibernate:
             jdbc.AbstractBatcher: INFO
-            type: TRACE
+            type: INFO

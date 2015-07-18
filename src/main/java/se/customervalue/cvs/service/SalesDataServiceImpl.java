@@ -137,7 +137,7 @@ public class SalesDataServiceImpl implements SalesDataService {
 				companySalesDataChecked.get(0).setStatus(SalesDataStatus.REPLACED);
 			}
 
-			salesDataImportService.start(new File(filepath), newSalesData);
+			salesDataImportService.start(new File(filepath), newSalesData.getSalesDataId());
 		} catch (IOException ex) {
 			salesDataRepository.delete(newSalesData);
 			throw new SalesDataUploadException();
