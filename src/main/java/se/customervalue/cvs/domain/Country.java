@@ -11,9 +11,9 @@ public class Country {
 
 	private String name;
 
-	private String ISO31661a2;
+	private String iso31661a2;
 
-	private String ISO31661a3;
+	private String iso31661a3;
 
 	private String numericCode;
 
@@ -25,10 +25,10 @@ public class Country {
 
 	public Country() {}
 
-	public Country(String name, String ISO31661a2, String ISO31661a3, String numericCode) {
+	public Country(String name, String iso31661a2, String iso31661a3, String numericCode) {
 		this.name = name;
-		this.ISO31661a2 = ISO31661a2;
-		this.ISO31661a3 = ISO31661a3;
+		this.iso31661a2 = iso31661a2;
+		this.iso31661a3 = iso31661a3;
 		this.numericCode = numericCode;
 	}
 
@@ -64,20 +64,20 @@ public class Country {
 		this.name = name;
 	}
 
-	public String getISO31661a2() {
-		return ISO31661a2;
+	public String getIso31661a2() {
+		return iso31661a2;
 	}
 
-	public void setISO31661a2(String ISO31661a2) {
-		this.ISO31661a2 = ISO31661a2;
+	public void setIso31661a2(String iso31661a2) {
+		this.iso31661a2 = iso31661a2;
 	}
 
-	public String getISO31661a3() {
-		return ISO31661a3;
+	public String getIso31661a3() {
+		return iso31661a3;
 	}
 
-	public void setISO31661a3(String ISO31661a3) {
-		this.ISO31661a3 = ISO31661a3;
+	public void setIso31661a3(String iso31661a3) {
+		this.iso31661a3 = iso31661a3;
 	}
 
 	public String getNumericCode() {

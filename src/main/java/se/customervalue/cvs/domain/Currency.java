@@ -11,7 +11,7 @@ public class Currency {
 
 	private String name;
 
-	private String ISO4217;
+	private String iso4217;
 
 	private String numericCode;
 
@@ -20,9 +20,9 @@ public class Currency {
 
 	public Currency() {}
 
-	public Currency(String name, String ISO4217, String numericCode) {
+	public Currency(String name, String iso4217, String numericCode) {
 		this.name = name;
-		this.ISO4217 = ISO4217;
+		this.iso4217 = iso4217;
 		this.numericCode = numericCode;
 	}
 
@@ -50,12 +50,12 @@ public class Currency {
 		this.name = name;
 	}
 
-	public String getISO4217() {
-		return ISO4217;
+	public String getIso4217() {
+		return iso4217;
 	}
 
-	public void setISO4217(String ISO4217) {
-		this.ISO4217 = ISO4217;
+	public void setIso4217(String iso4217) {
+		this.iso4217 = iso4217;
 	}
 
 	public String getNumericCode() {

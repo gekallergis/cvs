@@ -8,4 +8,5 @@ import javax.transaction.Transactional;
 @Transactional
 public interface CountryRepository extends JpaRepository<Country, Long> {
 	Country findByCountryId(int countryId);
+	Country findByIso31661a2(String ISO31661a2);
 }

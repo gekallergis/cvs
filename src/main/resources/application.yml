@@ -27,7 +27,10 @@ spring.datasource:
 
 spring.jpa:
     database: MYSQL
-    show-sql: false
+    show-sql: true
+    hibernate.order-inserts: true
+    hibernate.order-updates: true
+    hibernate.jdbc.batch-size: 50
     hibernate.ddl-auto: create
     hibernate.naming-strategy: org.hibernate.cfg.DefaultNamingStrategy
     properties:
@@ -60,4 +63,5 @@ logging:
             core: INFO
             data: INFO
         org.hibernate:
-            type: INFO
+            jdbc.AbstractBatcher: INFO
+            type: TRACE
