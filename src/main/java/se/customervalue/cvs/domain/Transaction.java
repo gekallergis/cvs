@@ -5,6 +5,9 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
+@Table(uniqueConstraints = {
+		@UniqueConstraint(name = "duplicate_transactions", columnNames = {"consumerId", "date"})
+})
 public class Transaction {
 	@Id	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int transactionId;

@@ -11,17 +11,13 @@ import se.customervalue.cvs.abstraction.dataaccess.SalesDataRepository;
 import se.customervalue.cvs.abstraction.dataaccess.TransactionRepository;
 import se.customervalue.cvs.common.CVSConfig;
 import se.customervalue.cvs.domain.*;
+import se.customervalue.cvs.domain.Currency;
 
 import javax.transaction.Transactional;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 
 @Service
 public class SalesDataImportServiceImpl implements SalesDataImportService {
@@ -43,16 +39,17 @@ public class SalesDataImportServiceImpl implements SalesDataImportService {
 	public void start(File file, int salesDataId) {
 		SalesData salesData = salesDataRepository.findBySalesDataId(salesDataId);
 		if(isValid(file, salesData)) {
-			importTransactions(salesData);
+			importTransactions(preprocessTransactions(file, salesData), salesData);
+			// TODO: Maybe clean up temporary files!
 		} else {
-			log.error("[Sales Data Validation Service] Error validating sales data file " + file.getAbsolutePath());
+			log.error("[Sales Data Import Service] Error validating sales data file " + file.getAbsolutePath());
 			salesData.setStatus(SalesDataStatus.ERROR);
 			salesDataRepository.save(salesData);
 		}
 	}
 
 	private boolean isValid(File file, SalesData salesData) {
-		log.debug("[Sales Data Validation Service] Validating file " + file.getAbsolutePath());
+		log.debug("[Sales Data Import Service] Validating file " + file.getAbsolutePath());
 
 		boolean salesDataFileIsValid = true;
 		try {
@@ -88,12 +85,12 @@ public class SalesDataImportServiceImpl implements SalesDataImportService {
 						String[] data = line.split("\t");
 						Date transactionDate = dateFormat.parse(data[2]);
 						if(transactionDate.before(earliestAllowedDate) || transactionDate.after(latestAllowedDate)) {
-							log.error("[Sales Data Validation Service] Invalid date on line " + lineNumber);
+							log.error("[Sales Data Import Service] Invalid date on line " + lineNumber);
 							salesDataFileIsValid = false;
 							break;
 						}
 					} else {
-						log.error("[Sales Data Validation Service] Invalid transaction format on line " + lineNumber);
+						log.error("[Sales Data Import Service] Invalid transaction format on line " + lineNumber);
 						salesDataFileIsValid = false;
 						break;
 					}
@@ -101,7 +98,7 @@ public class SalesDataImportServiceImpl implements SalesDataImportService {
 			}
 			long endTime = System.nanoTime();
 			long duration = (endTime - startTime) / 1000000;
-			log.debug("[Sales Data Validation Service] " + file.getName() + " validated in " + duration + "ms");
+			log.debug("[Sales Data Import Service] " + file.getName() + " validated in " + duration + "ms");
 		} catch (IOException | ParseException ex) {
 			salesDataFileIsValid = false;
 			salesData.setStatus(SalesDataStatus.ERROR);
@@ -111,14 +108,66 @@ public class SalesDataImportServiceImpl implements SalesDataImportService {
 		return salesDataFileIsValid;
 	}
 
-	private void importTransactions(SalesData salesData) {
-		log.debug("[Sales Data Validation Service] Importing transactions for sales data batch ID " + salesData.getSalesDataId());
+	private File preprocessTransactions(File file, SalesData salesData) {
+		File processedTransactions = new File(CVSConfig.TEMP_FS_STORE + "\\" + salesData.getSalesDataId() + ".txt");
+
+		Map<String, String> countryToID = new HashMap<>();
+		Map<String, String> currencyToID = new HashMap<>();
+
+		try {
+			long startTime = System.nanoTime();
+			try(BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
+				BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(processedTransactions));
+				bufferedWriter.write("edgeid\tcountry\tord_date\tord_year\tcurrency\tamount\n");
+				String inLine = bufferedReader.readLine();
+				while((inLine = bufferedReader.readLine()) != null) {
+					String[] data = inLine.split("\t");
+
+					// Replace Country ISO code with Country ID
+					String countryCodeIso31661a2 = data[1].substring(1, 3);
+					if(countryToID.containsKey(countryCodeIso31661a2)) {
+						data[1] = countryToID.get(countryCodeIso31661a2);
+					} else {
+						log.warn("[Sales Data Import Service] Looking up " + countryCodeIso31661a2 + " country ISO code!");
+						Country country = countryRepository.findByIso31661a2(countryCodeIso31661a2);
+						countryToID.put(countryCodeIso31661a2, String.valueOf(country.getCountryId()));
+						data[1] = String.valueOf(country.getCountryId());
+					}
+
+					// Replace Currency ISO code with Currency ID
+					String currencyCodeIso4217 = data[4].substring(1, 4);
+					if(currencyToID.containsKey(currencyCodeIso4217)){
+						data[4] = currencyToID.get(currencyCodeIso4217);
+					} else {
+						log.warn("[Sales Data Import Service] Looking up " + currencyCodeIso4217 + " currency ISO code!");
+						Currency currency = currencyRepository.findByIso4217(currencyCodeIso4217);
+						currencyToID.put(currencyCodeIso4217, String.valueOf(currency.getCurrencyId()));
+						data[4] = String.valueOf(currency.getCurrencyId());
+					}
+
+					bufferedWriter.write(data[0] + "\t" + data[1] + "\t" + data[2] + "\t" + data[3] + "\t" + data[4] + "\t" + data[5] + "\n");
+				}
+				bufferedWriter.close();
+			}
+			long endTime = System.nanoTime();
+			long duration = (endTime - startTime) / 1000000;
+			log.debug("[Sales Data Import Service] " + file.getName() + " processed in " + duration + "ms");
+		} catch (IOException ex) {
+			log.error("[Sales Data Import Service] Preprocessing did not comlete! Returning original sales data file!");
+			return file;
+		}
+
+		return processedTransactions;
+	}
+
+	private void importTransactions(File file, SalesData salesData) {
+		log.debug("[Sales Data Import Service] Importing transactions for sales data batch ID " + salesData.getSalesDataId());
 
 		long startTime = System.nanoTime();
-		int modifications = salesDataRepository.importSalesDataBatch(salesData.getFilePath().replace("\\", "/"), salesData.getSalesDataId());
+		int modifications = salesDataRepository.importSalesDataBatchNoSelect(file.getAbsolutePath().replace("\\", "/"), salesData.getSalesDataId());
 		long endTime = System.nanoTime();
 		long duration = (endTime - startTime) / 1000000;
-		log.debug("[Sales Data Validation Service] Imported " + modifications + " records to the database in " + duration + "ms");
+		log.debug("[Sales Data Import Service] Imported " + modifications + " records to the database in " + duration + "ms");
 
 		salesData.setStatus(SalesDataStatus.CHECKED);
 		salesDataRepository.save(salesData);

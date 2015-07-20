@@ -21,4 +21,8 @@ public interface SalesDataRepository extends JpaRepository<SalesData, Long> {
 	@Modifying
 	@Query(value = "LOAD DATA LOCAL INFILE ?1 INTO TABLE cvs.transaction FIELDS TERMINATED BY '\\t' OPTIONALLY ENCLOSED BY '\"' LINES TERMINATED BY '\\r\\n' IGNORE 1 LINES (consumerId, @countryId, date, @dummy, @currencyId, amount) SET country = (SELECT countryId FROM country WHERE iso31661a2 = TRIM(BOTH '\"' FROM @countryId)), currency = (SELECT currencyId FROM currency WHERE iso4217 = TRIM(BOTH '\"' FROM @currencyId)), salesDataBatch = ?2 ;", nativeQuery = true)
 	int importSalesDataBatch(String filePath, int salesDataBatchId);
+
+	@Modifying
+	@Query(value = "LOAD DATA LOCAL INFILE ?1 INTO TABLE cvs.transaction FIELDS TERMINATED BY '\\t' OPTIONALLY ENCLOSED BY '\"' LINES TERMINATED BY '\\n' IGNORE 1 LINES (consumerId, country, date, @dummy, currency, amount) SET salesDataBatch = ?2 ;", nativeQuery = true)
+	int importSalesDataBatchNoSelect(String filePath, int salesDataBatchId);
 }
