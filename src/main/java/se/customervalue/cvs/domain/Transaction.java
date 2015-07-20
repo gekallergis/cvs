@@ -1,6 +1,7 @@
 package se.customervalue.cvs.domain;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -13,7 +14,7 @@ public class Transaction {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date date;
 
-	private float amount;
+	private BigDecimal amount;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="salesDataBatch", foreignKey = @ForeignKey(name = "FK_TransactionSalesDataBatch"))
@@ -29,34 +30,10 @@ public class Transaction {
 
 	public Transaction() {}
 
-	public Transaction(String consumerId, Date date, float amount) {
+	public Transaction(String consumerId, Date date, BigDecimal amount) {
 		this.consumerId = consumerId;
 		this.date = date;
 		this.amount = amount;
-	}
-
-	public SalesData getSalesDataBatch() {
-		return salesDataBatch;
-	}
-
-	public void setSalesDataBatch(SalesData salesDataBatch) {
-		this.salesDataBatch = salesDataBatch;
-	}
-
-	public Country getCountry() {
-		return country;
-	}
-
-	public void setCountry(Country country) {
-		this.country = country;
-	}
-
-	public Currency getCurrency() {
-		return currency;
-	}
-
-	public void setCurrency(Currency currency) {
-		this.currency = currency;
 	}
 
 	public int getTransactionId() {
@@ -83,11 +60,35 @@ public class Transaction {
 		this.date = date;
 	}
 
-	public float getAmount() {
+	public BigDecimal getAmount() {
 		return amount;
 	}
 
-	public void setAmount(float amount) {
+	public void setAmount(BigDecimal amount) {
 		this.amount = amount;
+	}
+
+	public SalesData getSalesDataBatch() {
+		return salesDataBatch;
+	}
+
+	public void setSalesDataBatch(SalesData salesDataBatch) {
+		this.salesDataBatch = salesDataBatch;
+	}
+
+	public Country getCountry() {
+		return country;
+	}
+
+	public void setCountry(Country country) {
+		this.country = country;
+	}
+
+	public Currency getCurrency() {
+		return currency;
+	}
+
+	public void setCurrency(Currency currency) {
+		this.currency = currency;
 	}
 }
