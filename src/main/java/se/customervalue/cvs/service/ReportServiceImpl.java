@@ -189,7 +189,7 @@ public class ReportServiceImpl implements ReportService {
 			throw new UnauthorizedReportGeneration();
 		}
 
-		GennyResponseRepresentation response = genny.generate(new GennyRequestRepresentation(reportSalesData.getSalesDataId(), generationRequester.getEmployeeId(), reportCompany.getCompanyId(), reportOwnedProduct.getOwnedProductId()));
+		GennyResponseRepresentation response = genny.generate(new GennyRequestRepresentation(reportSalesData.getSalesDataId(), generationRequester.getEmployeeId(), reportCompany.getCompanyId(), reportOwnedProduct.getOwnedProductId(), report.getLanguageId(), report.getCurrencyId()));
 		if(response.getCode().equals("020")) {
 			return new APIResponseRepresentation("020", "Report generation started successfully!");
 		} else {
