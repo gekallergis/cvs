@@ -128,7 +128,7 @@ public class SalesDataImportServiceImpl implements SalesDataImportService {
 					if(countryToID.containsKey(countryCodeIso31661a2)) {
 						data[1] = countryToID.get(countryCodeIso31661a2);
 					} else {
-						log.warn("[Sales Data Import Service] Looking up " + countryCodeIso31661a2 + " country ISO code!");
+						log.debug("[Sales Data Import Service] Looking up " + countryCodeIso31661a2 + " country ISO code!");
 						Country country = countryRepository.findByIso31661a2(countryCodeIso31661a2);
 						countryToID.put(countryCodeIso31661a2, String.valueOf(country.getCountryId()));
 						data[1] = String.valueOf(country.getCountryId());
@@ -139,11 +139,13 @@ public class SalesDataImportServiceImpl implements SalesDataImportService {
 					if(currencyToID.containsKey(currencyCodeIso4217)){
 						data[4] = currencyToID.get(currencyCodeIso4217);
 					} else {
-						log.warn("[Sales Data Import Service] Looking up " + currencyCodeIso4217 + " currency ISO code!");
+						log.debug("[Sales Data Import Service] Looking up " + currencyCodeIso4217 + " currency ISO code!");
 						Currency currency = currencyRepository.findByIso4217(currencyCodeIso4217);
 						currencyToID.put(currencyCodeIso4217, String.valueOf(currency.getCurrencyId()));
 						data[4] = String.valueOf(currency.getCurrencyId());
 					}
+
+					// TODO: Currency Conversion
 
 					bufferedWriter.write(data[0] + "\t" + data[1] + "\t" + data[2] + "\t" + data[3] + "\t" + data[4] + "\t" + data[5] + "\n");
 				}
