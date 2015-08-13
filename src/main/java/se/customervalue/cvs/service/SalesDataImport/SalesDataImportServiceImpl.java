@@ -145,7 +145,7 @@ public class SalesDataImportServiceImpl implements SalesDataImportService {
 						data[4] = String.valueOf(currency.getCurrencyId());
 					}
 
-					// TODO: Currency Conversion
+					// TODO: Currency Conversion to SEK before importing to DB
 
 					bufferedWriter.write(data[0] + "\t" + data[1] + "\t" + data[2] + "\t" + data[3] + "\t" + data[4] + "\t" + data[5] + "\n");
 				}
