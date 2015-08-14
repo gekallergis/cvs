@@ -98,7 +98,7 @@ public class SalesDataImportServiceImpl implements SalesDataImportService {
 			}
 			long endTime = System.nanoTime();
 			long duration = (endTime - startTime) / 1000000;
-			log.debug("[Sales Data Import Service] " + file.getName() + " validated in " + duration + "ms");
+			log.debug("[PROFILING::" + salesData.getSalesDataId() + "] Validation: " + duration + "ms");
 		} catch (IOException | ParseException ex) {
 			salesDataFileIsValid = false;
 			salesData.setStatus(SalesDataStatus.ERROR);
@@ -153,7 +153,7 @@ public class SalesDataImportServiceImpl implements SalesDataImportService {
 			}
 			long endTime = System.nanoTime();
 			long duration = (endTime - startTime) / 1000000;
-			log.debug("[Sales Data Import Service] " + file.getName() + " processed in " + duration + "ms");
+			log.debug("[PROFILING::" + salesData.getSalesDataId() + "] Preprocessing: " + duration + "ms");
 		} catch (IOException ex) {
 			log.error("[Sales Data Import Service] Preprocessing did not comlete! Returning original sales data file!");
 			return file;
@@ -169,7 +169,7 @@ public class SalesDataImportServiceImpl implements SalesDataImportService {
 		int modifications = salesDataRepository.importSalesDataBatchNoSelect(file.getAbsolutePath().replace("\\", "/"), salesData.getSalesDataId());
 		long endTime = System.nanoTime();
 		long duration = (endTime - startTime) / 1000000;
-		log.debug("[Sales Data Import Service] Imported " + modifications + " records to the database in " + duration + "ms");
+		log.debug("[PROFILING::" + salesData.getSalesDataId() + "] Importing (" + modifications + " records): " + duration + "ms");
 
 		salesData.setStatus(SalesDataStatus.CHECKED);
 		salesDataRepository.save(salesData);

@@ -667,6 +667,8 @@ public class AccountServiceImpl implements AccountService {
 			throw new CompanyAlreadyExistsException();
 		}
 
+		// TODO: Create DB view for new company
+
 		log.debug("[Account Service] Added new company!");
 		return new APIResponseRepresentation("011", "New company successfully added!");
 	}
