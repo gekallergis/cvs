@@ -9,12 +9,15 @@ import se.customervalue.cvs.abstraction.dataaccess.CountryRepository;
 import se.customervalue.cvs.abstraction.dataaccess.CurrencyRepository;
 import se.customervalue.cvs.abstraction.dataaccess.SalesDataRepository;
 import se.customervalue.cvs.abstraction.dataaccess.TransactionRepository;
+import se.customervalue.cvs.abstraction.externalservice.ExchangeRateService.ExchangeRateService;
+import se.customervalue.cvs.abstraction.externalservice.ExchangeRateService.exception.ExchangeRateException;
 import se.customervalue.cvs.common.CVSConfig;
 import se.customervalue.cvs.domain.*;
 import se.customervalue.cvs.domain.Currency;
 
 import javax.transaction.Transactional;
 import java.io.*;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -34,6 +37,9 @@ public class SalesDataImportServiceImpl implements SalesDataImportService {
 
 	@Autowired
 	private CurrencyRepository currencyRepository;
+
+	@Autowired
+	private ExchangeRateService fixer;
 
 	@Override @Async @Transactional
 	public void start(File file, int salesDataId) {
@@ -117,6 +123,8 @@ public class SalesDataImportServiceImpl implements SalesDataImportService {
 
 		try {
 			long startTime = System.nanoTime();
+			Currency baseCurrency = new Currency("Swedish krona/kronor", "SEK", "752");
+			fixer.setBaseCurrency(baseCurrency);
 			try(BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
 				BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(processedTransactions));
 				bufferedWriter.write("edgeid\tcountry\tord_date\tord_year\tcurrency\tamount\n");
@@ -146,7 +154,8 @@ public class SalesDataImportServiceImpl implements SalesDataImportService {
 						data[4] = String.valueOf(currency.getCurrencyId());
 					}
 
-					// TODO: Currency Conversion to SEK before importing to DB
+					// Currency Conversion to SEK before importing to DB
+					data[5] = fixer.convertToBase(currencyCodeIso4217, new BigDecimal(data[5])).toString();
 
 					bufferedWriter.write(data[0] + "\t" + data[1] + "\t" + data[2] + "\t" + data[3] + "\t" + data[4] + "\t" + data[5] + "\n");
 				}
@@ -155,7 +164,7 @@ public class SalesDataImportServiceImpl implements SalesDataImportService {
 			long endTime = System.nanoTime();
 			long duration = (endTime - startTime) / 1000000;
 			log.debug("[PROFILING::" + salesData.getSalesDataId() + "] Preprocessing: " + duration + "ms");
-		} catch (IOException ex) {
+		} catch (IOException | ExchangeRateException ex) {
 			log.error("[Sales Data Import Service] Preprocessing did not comlete! Returning original sales data file!");
 			return file;
 		}
