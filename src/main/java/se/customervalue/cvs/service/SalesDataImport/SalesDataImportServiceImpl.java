@@ -58,7 +58,7 @@ public class SalesDataImportServiceImpl implements SalesDataImportService {
 			// File Validation Process
 			String edgeID = "\\d{1,20}";
 			String country = "\"[A-Z]{1,3}\"";
-			String ordDate = "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}";
+			String ordDate = "\\d{4}-\\d{2}-\\d{2}";
 			String ordYear = "\\d{4}";
 			String currency = "\"[A-Z]{2,3}\"";
 			String amount = "-?\\d{0,6}(\\.\\d{1,10})?";
@@ -75,6 +75,7 @@ public class SalesDataImportServiceImpl implements SalesDataImportService {
 			try(BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
 				String line = bufferedReader.readLine();
 				if(line == null || !line.equals("edgeid\tcountry\tord_date\tord_year\tcurrency\tamount")) {
+					log.error("[Sales Data Import Service] Invalid header line " + line);
 					salesDataFileIsValid = false;
 				}
 
@@ -83,7 +84,7 @@ public class SalesDataImportServiceImpl implements SalesDataImportService {
 					lineNumber++;
 					if(line.matches(edgeID + "\\t" + country + "\\t" + ordDate + "\\t" + ordYear + "\\t" + currency + "\\t" + amount)) {
 						String[] data = line.split("\t");
-						Date transactionDate = dateFormat.parse(data[2]);
+						Date transactionDate = dateFormat.parse(data[2] + " 00:00:00");
 						if(transactionDate.before(earliestAllowedDate) || transactionDate.after(latestAllowedDate)) {
 							log.error("[Sales Data Import Service] Invalid date on line " + lineNumber);
 							salesDataFileIsValid = false;
